@@ -302,6 +302,9 @@
 			// helper method
 			var hasValue = function(item){
 				return item.value !== null;
+			},
+			previousPoint = function(point, collection, index){
+				return helpers.findPreviousWhere(collection, hasValue, index) || point;
 			};
 			
 			// Draw all of the data
@@ -312,7 +315,7 @@
 				//We can use this extra loop to calculate the control points of this dataset also in this loop
 
 				helpers.each(dataset.points, function(point, index){
-					if (point.x !== null && point.y !== null){
+					if (point.x !== null && point.y !== null) {
 						point.transition(this.scale.getPointPosition(point.value.real, point.value.imag), easingDecimal);
 					}
 				},this);
@@ -327,7 +330,48 @@
 						ctx.moveTo(point.x, point.y);
 					}
 					else {
-						ctx.lineTo(point.x,point.y);
+						var previous = previousPoint(point, pointsWithValues, index);  // need to the old point to see if we arc along real or imaginary
+						
+						if (previous !== null)
+						{
+							if (previous.value.real == point.value.real)
+							{
+								// arc along the constant real circle
+								// real arcs should never go along the route that goes to the right side of the canvas. 
+								var realRadius = 1 / (1 + point.value.real) * (this.scale.drawingArea / 2); // scale for the drawingArea size
+								var realCenterX = this.scale.drawCenterX + ((point.value.real / (1 + point.value.real)) * (this.scale.drawingArea / 2));
+								var realCenterY = this.scale.drawCenterY;
+								
+								var startAngle = Math.atan2(previous.y - realCenterY, previous.x - realCenterX);
+								var endAngle = Math.atan2(point.y - realCenterY, point.x - realCenterX);
+								
+								startAngle += startAngle < 0 ? 2 * Math.PI: 0;
+								endAngle += endAngle < 0 ? 2 * Math.PI : 0;
+								ctx.arc(realCenterX, realCenterY, realRadius, startAngle, endAngle, startAngle > endAngle);
+								ctx.moveTo(point.x, point.y);
+							}
+							else if (previous.value.imag === point.value.imag) {
+								// arc along the constant imaginary circle
+								// imaginary arcs should never go outside the graph
+								var imagRadius = (1 / Math.abs(point.value.imag)) * (this.scale.drawingArea / 2);
+								var imagCenterX = this.scale.drawCenterX + (this.scale.drawingArea / 2); // far right side of the drawing area
+								var imagCenterY = point.value.imag > 0 ? this.scale.drawCenterY - imagRadius : this.scale.drawCenterY + imagRadius;
+								
+								var startAngle = Math.atan2(previous.y - imagCenterY, previous.x - imagCenterX);
+								var endAngle = Math.atan2(point.y - imagCenterY, point.x - imagCenterX);
+								
+								startAngle += startAngle < 0 ? 2 * Math.PI: 0;
+								endAngle += endAngle < 0 ? 2 * Math.PI : 0;
+								ctx.arc(imagCenterX, imagCenterY, imagRadius, startAngle, endAngle, endAngle < startAngle);
+								ctx.moveTo(point.x, point.y);
+							}
+							else {
+								ctx.lineTo(point.x, point.y);
+							}
+						}
+						else {
+							ctx.lineTo(point.x,point.y);
+						}
 					}
 				}, this);
 
