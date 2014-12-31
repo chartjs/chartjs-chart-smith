@@ -35,6 +35,8 @@
 				initialize: function(){
 					this.size = helpers.min([this.height, this.width]);
 					this.drawingArea = (this.display) ? (this.size / 2) - (this.fontSize / 2 + this.backdropPaddingY) : (this.size / 2);
+					this.drawCenterX = (this.display) ? this.backdropPaddingX + (this.drawingArea / 2) : this.drawingArea / 2;
+					this.drawCenterY = (this.display) ? this.backdropPaddingY + (this.drawingArea / 2) : this.drawingArea / 2;
 				},
 				// Method to actually draw the scale
 				draw: function() {
@@ -52,17 +54,14 @@
 						
 						// Hard code for now. Eventually will provide some options to dynamically generate these
 						var rCircles = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0, 50.0];
-						
-						// Center point of the canvas area we will use. This becomes the 1.0, 1.0 intersection
-						var centerX = this.drawingArea / 2,
-							centerY = centerX;
+
 						// Draw each of the circles
 						helpers.each(rCircles, function(r, rIndex) {
 							var radius = 1 / (1 + r) * (this.drawingArea / 2); // scale for the drawingArea size
-							var x = centerX + ((r / (1 + r)) * (this.drawingArea / 2));
+							var x = this.drawCenterX + ((r / (1 + r)) * (this.drawingArea / 2));
 							
 							ctx.beginPath();
-							ctx.arc(x, centerY, radius, 0, 2 * Math.PI);
+							ctx.arc(x, this.drawCenterY, radius, 0, 2 * Math.PI);
 							ctx.closePath();
 							ctx.stroke();
 						}, this);
@@ -79,8 +78,8 @@
 						
 						// 0 Special case
 						ctx.beginPath();
-						ctx.moveTo(0, centerY);
-						ctx.lineTo(this.drawingArea, centerY);
+						ctx.moveTo(0, this.drawCenterY);
+						ctx.lineTo(this.drawingArea, this.drawCenterY);
 						ctx.stroke();
 						ctx.closePath();
 						
@@ -88,14 +87,14 @@
 							// Draw the positive circle
 							var xRadius = 1 / x * this.drawingArea / 2;
 							var x = this.drawingArea; // far right side of the canvas
-							var y = centerY - xRadius;
+							var y = this.drawCenterY - xRadius;
 							
 							// Ok, these circles are a pain. They need to only be drawn in the region that intersects the resistance == 0 circle. This circle has a radius of 0.5 * this.drawingArea and is
 							// centered at (0.5 * this.drawingArea, 0.5 * this.drawingArea)
 							
 							// We will solve the intersection in polar coordinates and define (0, 0) as the center of the xCircle, ie (x, y)
-							var r0 = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-							var angle = Math.atan2(centerY - y, centerX - x);
+							var r0 = Math.sqrt(Math.pow(x - this.drawCenterX, 2) + Math.pow(y - this.drawCenterY, 2));
+							var angle = Math.atan2(this.drawCenterY - y, this.drawCenterX - x);
 							
 							// A circle at location r0, angle with radius a is defined in polar coordinates by the equation
 							// r = r0 * cos(phi - angle) + sqrt(a^2 - ((r0^2) * sin^2(phi - angle)))
@@ -112,10 +111,10 @@
 							ctx.closePath();
 						
 							// Negative circle
-							y = centerY + xRadius;
+							y = this.drawCenterY + xRadius;
 							{
-								var r0 = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-								var angle = Math.atan2(centerY - y, centerX - x); // atan2 should always return an angle in [-PI/2, 0) for these circles
+								var r0 = Math.sqrt(Math.pow(x - this.drawCenterX, 2) + Math.pow(y - this.drawCenterY, 2));
+								var angle = Math.atan2(this.drawCenterY - y, this.drawCenterX - x); // atan2 should always return an angle in [-PI/2, 0) for these circles
 								var arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.drawingArea / 2, 2)) / Math.pow(r0, 2));
 								var phi2 = (-0.5 * arccos) + angle;
 								
