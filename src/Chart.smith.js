@@ -21,6 +21,18 @@
 
 		//Number - The backdrop padding to the side of the label in pixels
 		scaleBackdropPaddingX : 2,
+		
+		//Boolean - Whether to show a dot for each point
+		pointDot : true,
+
+		//Number - Radius of each point dot in pixels
+		pointDotRadius : 4,
+
+		//Number - Pixel width of point dot stroke
+		pointDotStrokeWidth : 1,
+
+		//Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+		pointHitDetectionRadius : 20,
 	};
 	
 	Chart.Type.extend({
@@ -30,6 +42,20 @@
 		initialize: function(data) {
 			var options = this.options; // expose options as a scope variable so that the scale class can access italics
 			
+			//Declare the extension of the default point, to cater for the options passed in to the constructor
+			this.PointClass = Chart.Point.extend({
+				strokeWidth : options.pointDotStrokeWidth,
+				radius : options.pointDotRadius,
+				display: options.pointDot,
+				hitDetectionRadius : options.pointHitDetectionRadius,
+				ctx : this.chart.ctx,
+				inRange : function(mouseX){
+					return (Math.pow(mouseX-this.x, 2) < Math.pow(this.radius + this.hitDetectionRadius,2));
+				}
+			});
+
+			this.datasets = [];
+			
 			// Smith charts use a unique scale. This needs to be written from scratch.
 			this.ScaleClass = Chart.Element.extend({
 				initialize: function(){
@@ -37,6 +63,29 @@
 					this.drawingArea = (this.display) ? (this.size / 2) - (this.fontSize / 2 + this.backdropPaddingY) : (this.size / 2);
 					this.drawCenterX = (this.display) ? this.backdropPaddingX + (this.drawingArea / 2) : this.drawingArea / 2;
 					this.drawCenterY = (this.display) ? this.backdropPaddingY + (this.drawingArea / 2) : this.drawingArea / 2;
+				},
+				// Method to get the x,y position of a point given it's real and imaginary value
+				getPointPosition : function(real, imag) {
+					// look for the intersection of the r circle and the x circle that is not the one along the right side of the canvas
+					var realRadius = 1 / (1 + real) * (this.drawingArea / 2); // scale for the drawingArea size
+					var realCenterX = this.drawCenterX + ((real / (1 + real)) * (this.drawingArea / 2));
+					var realCenterY = this.drawCenterY;
+					
+					var imagRadius = (1 / Math.abs(imag)) * (this.drawingArea / 2);
+					var imagCenterX = this.drawCenterX + (this.drawingArea / 2); // far right side of the drawing area
+					var imagCenterY = imag > 0 ? this.drawCenterY - imagRadius : this.drawCenterY + imagRadius;
+					
+					var r0 = Math.sqrt(Math.pow(imagCenterX - realCenterX, 2) + Math.pow(imagCenterY - realCenterY, 2));
+					var angle = Math.atan2(realCenterY - imagCenterY, realCenterX - imagCenterX);
+					var arccos = Math.acos((Math.pow(imagRadius, 2) - Math.pow(realRadius, 2)) / Math.pow(r0, 2));
+					var phi = imag > 0 ? 0.5 * arccos + angle : -0.5 * arccos + angle;
+					
+					// We have an r and a phi from the point (imagCenterX, imagCenterY)
+					// translate to an x and a undefined
+					return {
+						x : (Math.cos(phi) * imagRadius) + imagCenterX,
+						y : (Math.sin(phi) * imagRadius) + imagCenterY
+					};
 				},
 				// Method to actually draw the scale
 				draw: function() {
@@ -85,8 +134,8 @@
 						
 						helpers.each(xCircles, function(x, xIndex) {
 							// Draw the positive circle
-							var xRadius = 1 / x * this.drawingArea / 2;
-							var x = this.drawingArea; // far right side of the canvas
+							var xRadius = (1 / x) * (this.drawingArea / 2);
+							var x = this.drawCenterX + (this.drawingArea / 2); // far right side of the drawing area
 							var y = this.drawCenterY - xRadius;
 							
 							// Ok, these circles are a pain. They need to only be drawn in the region that intersects the resistance == 0 circle. This circle has a radius of 0.5 * this.drawingArea and is
@@ -130,11 +179,58 @@
 				},
 			});
 			
-			this.buildScale(data.labels);
+			//Iterate through each of the datasets, and build this into a property of the chart
+			helpers.each(data.datasets,function(dataset){
+
+				var datasetObject = {
+					label : dataset.label || null,
+					fillColor : dataset.fillColor,
+					strokeColor : dataset.strokeColor,
+					pointColor : dataset.pointColor,
+					pointStrokeColor : dataset.pointStrokeColor,
+					points : []
+				};
+
+				this.datasets.push(datasetObject);
+
+				helpers.each(dataset.data,function(dataPoint,index){
+					//Add a new point for each piece of data, passing any required data to draw.
+					datasetObject.points.push(new this.PointClass({
+						value : dataPoint, // data point is complex here
+						//label : data.labels[index],
+						datasetLabel: dataset.label,
+						strokeColor : dataset.pointStrokeColor,
+						fillColor : dataset.pointColor,
+						highlightFill : dataset.pointHighlightFill || dataset.pointColor,
+						highlightStroke : dataset.pointHighlightStroke || dataset.pointStrokeColor
+					}));
+				},this);
+
+				this.buildScale(data.labels);
+			},this);
+
+			this.eachPoints(function(point, index){
+				helpers.extend(point, this.scale.getPointPosition(point.value.real, point.value.imag));
+				point.save();
+			}, this);
+
+			this.render();
 		},
 		update : function(){
 			this.scale.update();
+			// Reset any highlight colours before updating.
+			helpers.each(this.activeElements, function(activeElement){
+				activeElement.restore(['fillColor', 'strokeColor']);
+			});
+			this.eachPoints(function(point){
+				point.save();
+			});
 			this.render();
+		},
+		eachPoints : function(callback){
+			helpers.each(this.datasets,function(dataset){
+				helpers.each(dataset.points,callback,this);
+			},this);
 		},
 		buildScale : function(labels) {
 			var self = this;
@@ -157,7 +253,7 @@
 				fontSize : this.options.scaleFontSize,
 				fontStyle : this.options.scaleFontStyle,
 				fontFamily : this.options.scaleFontFamily,
-				valuesCount : labels.length,
+				//valuesCount : labels.length,
 				beginAtZero : this.options.scaleBeginAtZero,
 				integersOnly : this.options.scaleIntegersOnly,
 				calculateYRange : function(currentHeight){
@@ -202,6 +298,48 @@
 			
 			var ctx = this.chart.ctx;
 			this.scale.draw();
+			
+			// helper method
+			var hasValue = function(item){
+				return item.value !== null;
+			};
+			
+			// Draw all of the data
+			helpers.each(this.datasets,function(dataset){
+				var pointsWithValues = helpers.where(dataset.points, hasValue);
+
+				//Transition each point first so that the line and point drawing isn't out of sync
+				//We can use this extra loop to calculate the control points of this dataset also in this loop
+
+				helpers.each(dataset.points, function(point, index){
+					if (point.x !== null && point.y !== null){
+						point.transition(this.scale.getPointPosition(point.value.real, point.value.imag), easingDecimal);
+					}
+				},this);
+
+				//Draw the line between all the points
+				ctx.lineWidth = this.options.datasetStrokeWidth;
+				ctx.strokeStyle = dataset.strokeColor;
+				ctx.beginPath();
+
+				helpers.each(pointsWithValues, function(point, index){
+					if (index === 0){
+						ctx.moveTo(point.x, point.y);
+					}
+					else {
+						ctx.lineTo(point.x,point.y);
+					}
+				}, this);
+
+				ctx.stroke();
+
+				//Now draw the points over the line
+				//A little inefficient double looping, but better than the line
+				//lagging behind the point positions
+				helpers.each(pointsWithValues,function(point){
+					point.draw();
+				});
+			},this);
 		},
 	});
 }).call(this);
