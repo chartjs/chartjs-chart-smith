@@ -32,7 +32,16 @@
 		pointDotStrokeWidth : 1,
 
 		//Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-		pointHitDetectionRadius : 20,
+		pointHitDetectionRadius : 10,
+		
+		// String - Template string for single tooltips
+		tooltipTemplate: function (element) {
+			var str = "real :";
+			str += element.value.real;
+			str += "\n imag:";
+			str += element.value.imag;
+			return str;
+		},
 	};
 	
 	Chart.Type.extend({
@@ -49,12 +58,11 @@
 				display: options.pointDot,
 				hitDetectionRadius : options.pointHitDetectionRadius,
 				ctx : this.chart.ctx,
-				inRange : function(mouseX){
-					return (Math.pow(mouseX-this.x, 2) < Math.pow(this.radius + this.hitDetectionRadius,2));
+				inRange : function(mouseX, mouseY){
+					var detectRange = Math.pow(this.radius + this.hitDetectionRadius,2);
+					return (Math.pow(mouseX - this.x, 2) < detectRange && Math.pow(mouseY - this.y, 2) < detectRange);
 				}
 			});
-
-			this.datasets = [];
 			
 			// Smith charts use a unique scale. This needs to be written from scratch.
 			this.ScaleClass = Chart.Element.extend({
@@ -102,7 +110,7 @@
 						// The center point and radius will need to be scaled based on the size of the canvas
 						
 						// Hard code for now. Eventually will provide some options to dynamically generate these
-						var rCircles = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0, 50.0];
+						var rCircles = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0, 50.0];
 
 						// Draw each of the circles
 						helpers.each(rCircles, function(r, rIndex) {
@@ -179,6 +187,23 @@
 				},
 			});
 			
+			//Set up tooltip events on the chart
+			if (this.options.showTooltips){
+				helpers.bindEvents(this, this.options.tooltipEvents, function(evt){
+					var activePoints = (evt.type !== 'mouseout') ? this.getPointsAtEvent(evt) : [];
+					this.eachPoints(function(point){
+						point.restore(['fillColor', 'strokeColor']);
+					});
+					helpers.each(activePoints, function(activePoint){
+						activePoint.fillColor = activePoint.highlightFill;
+						activePoint.strokeColor = activePoint.highlightStroke;
+					});
+					this.showTooltip(activePoints);
+				});
+			}
+			
+			this.datasets = [];
+			
 			//Iterate through each of the datasets, and build this into a property of the chart
 			helpers.each(data.datasets,function(dataset){
 
@@ -216,6 +241,61 @@
 
 			this.render();
 		},
+		
+		// Overridden showTooltip to better work with complex data
+		showTooltip : function(ChartElements, forceRedraw){
+			// Only redraw the chart if we've actually changed what we're hovering on.
+			if (typeof this.activeElements === 'undefined') {
+				this.activeElements = [];
+			}
+
+			var isChanged = (function(Elements) {
+				var changed = false;
+
+				if (Elements.length !== this.activeElements.length){
+					changed = true;
+					return changed;
+				}
+
+				helpers.each(Elements, function(element, index) {
+					if (element !== this.activeElements[index]){
+						changed = true;
+					}
+				}, this);
+				return changed;
+			}).call(this, ChartElements);
+
+			if (!isChanged && !forceRedraw) {
+				return;
+			}
+			else {
+				this.activeElements = ChartElements;
+			}
+			
+			this.draw();
+			
+			if (ChartElements.length > 0) {
+				helpers.each(ChartElements, function(Element) {
+					var tooltipPosition = Element.tooltipPosition();
+					new Chart.Tooltip({
+						x: Math.round(tooltipPosition.x),
+						y: Math.round(tooltipPosition.y),
+						xPadding: this.options.tooltipXPadding,
+						yPadding: this.options.tooltipYPadding,
+						fillColor: this.options.tooltipFillColor,
+						textColor: this.options.tooltipFontColor,
+						fontFamily: this.options.tooltipFontFamily,
+						fontStyle: this.options.tooltipFontStyle,
+						fontSize: this.options.tooltipFontSize,
+						caretHeight: this.options.tooltipCaretSize,
+						cornerRadius: this.options.tooltipCornerRadius,
+						text: helpers.template(this.options.tooltipTemplate, Element),
+						chart: this.chart
+					}).draw();
+				}, this);
+			}
+			return this;
+		},
 		update : function(){
 			this.scale.update();
 			// Reset any highlight colours before updating.
@@ -231,6 +311,16 @@
 			helpers.each(this.datasets,function(dataset){
 				helpers.each(dataset.points,callback,this);
 			},this);
+		},
+		getPointsAtEvent : function(e){
+			var pointsArray = [],
+				eventPosition = helpers.getRelativePosition(e);
+			helpers.each(this.datasets,function(dataset){
+				helpers.each(dataset.points,function(point){
+					if (point.inRange(eventPosition.x,eventPosition.y)) pointsArray.push(point);
+				});
+			},this);
+			return pointsArray;
 		},
 		buildScale : function(labels) {
 			var self = this;
