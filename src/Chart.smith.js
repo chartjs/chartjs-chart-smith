@@ -246,41 +246,13 @@
 						}, this);
 						
 						helpers.each(this.xLabels, function(label, labelIndex) {
-							var metrics = ctx.measureText(label.text);
-							var xDiff = 0;
-							
-							if (label.x < this.drawCenterX) {
-								xDiff = -1.0 * metrics.width;
-							}
-							
-							if (label.y > this.drawCenterY) {
-								ctx.textBaseline = 'top';
-							}
-							else if (label.y < this.drawCenterY) {
-								ctx.textBaseline = 'bottom';
-							}
-							else {
-								ctx.textBaseline = 'middle';
-							}
-							
 							var ang = Math.atan2(label.y - this.drawCenterY, label.x - this.drawCenterX);
-							
-							if ((ang < (-0.5 * Math.PI)) || (ang > (0.5 * Math.PI))) {
-								ang += Math.PI;
-							}
-							
-							/*if (ang < 0 && ang > (0.5 * Math.PI)) {
-								ang += (0.5 * Math.PI);
-							}
-							else if (ang > 0 && ang < (0.5 * Math.PI))
-							{
-								ang -= (0.5 * Math.PI);
-							}*/
-							
+
 							ctx.save();
 							ctx.translate(label.x, label.y);
 							ctx.rotate(ang);
-							ctx.fillText(label.text, xDiff, 0);
+							ctx.textBaseline = 'middle';
+							ctx.fillText(label.text, 2, 0);
 							ctx.restore();
 						}, this);
 					}
