@@ -143,15 +143,15 @@
 						helpers.each(xCircles, function(x, xIndex) {
 							// Draw the positive circle
 							var xRadius = (1 / x) * (this.drawingArea / 2);
-							var x = this.drawCenterX + (this.drawingArea / 2); // far right side of the drawing area
-							var y = this.drawCenterY - xRadius;
+							var xCoord = this.drawCenterX + (this.drawingArea / 2); // far right side of the drawing area
+							var yCoord = this.drawCenterY - xRadius;
 							
 							// Ok, these circles are a pain. They need to only be drawn in the region that intersects the resistance == 0 circle. This circle has a radius of 0.5 * this.drawingArea and is
 							// centered at (0.5 * this.drawingArea, 0.5 * this.drawingArea)
 							
-							// We will solve the intersection in polar coordinates and define (0, 0) as the center of the xCircle, ie (x, y)
-							var r0 = Math.sqrt(Math.pow(x - this.drawCenterX, 2) + Math.pow(y - this.drawCenterY, 2));
-							var angle = Math.atan2(this.drawCenterY - y, this.drawCenterX - x);
+							// We will solve the intersection in polar coordinates and define (0, 0) as the center of the xCircle, ie (xCoord, yCoord)
+							var r0 = Math.sqrt(Math.pow(xCoord - this.drawCenterX, 2) + Math.pow(yCoord - this.drawCenterY, 2));
+							var angle = Math.atan2(this.drawCenterY - yCoord, this.drawCenterX - xCoord);
 							
 							// A circle at location r0, angle with radius a is defined in polar coordinates by the equation
 							// r = r0 * cos(phi - angle) + sqrt(a^2 - ((r0^2) * sin^2(phi - angle)))
@@ -163,25 +163,21 @@
 							
 							ctx.beginPath();
 							// These lines are always above the horizontal and always begin at 90 degrees
-							ctx.arc(x, y, xRadius, Math.PI / 2, phi2, false); // always draw counterclockwise for these arcs
+							ctx.arc(xCoord, yCoord, xRadius, Math.PI / 2, phi2, false); // always draw counterclockwise for these arcs
 							ctx.stroke();
 							ctx.closePath();
-						
+							
 							// Negative circle
-							y = this.drawCenterY + xRadius;
-							{
-								var r0 = Math.sqrt(Math.pow(x - this.drawCenterX, 2) + Math.pow(y - this.drawCenterY, 2));
-								var angle = Math.atan2(this.drawCenterY - y, this.drawCenterX - x); // atan2 should always return an angle in [-PI/2, 0) for these circles
-								var arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.drawingArea / 2, 2)) / Math.pow(r0, 2));
-								var phi2 = (-0.5 * arccos) + angle;
+							yCoord = this.drawCenterY + xRadius;
+							r0 = Math.sqrt(Math.pow(xCoord - this.drawCenterX, 2) + Math.pow(yCoord - this.drawCenterY, 2));
+							angle = Math.atan2(this.drawCenterY - yCoord, this.drawCenterX - xCoord); // atan2 should always return an angle in [-PI/2, 0) for these circles
+							arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.drawingArea / 2, 2)) / Math.pow(r0, 2));
+							phi2 = (-0.5 * arccos) + angle;
 								
-								ctx.beginPath();
-								ctx.arc(x, y, xRadius, -1 / 2 * Math.PI, phi2, true);
-								ctx.stroke();
-								ctx.closePath();
-							}
-							
-							
+							ctx.beginPath();
+							ctx.arc(xCoord, yCoord, xRadius, -1 / 2 * Math.PI, phi2, true);
+							ctx.stroke();
+							ctx.closePath();
 						}, this);
 					}
 				},
