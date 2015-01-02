@@ -1,6 +1,6 @@
 {
   "name": "Chart.Smtih.js",
-  "version": "0.1",
+  "version": "0.0.1",
   "description": "Smith chart implementation for Chart.js",
   "homepage": "https://github.com/nnnick/Chart.js",
   "author": "etimberg",
