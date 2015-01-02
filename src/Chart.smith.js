@@ -420,6 +420,9 @@
 						
 						if (previous !== null)
 						{
+							var startAngle = 0,
+								endAngle = 0;
+						
 							if (previous.value.real == point.value.real)
 							{
 								// arc along the constant real circle
@@ -428,8 +431,8 @@
 								var realCenterX = this.scale.drawCenterX + ((point.value.real / (1 + point.value.real)) * (this.scale.drawingArea / 2));
 								var realCenterY = this.scale.drawCenterY;
 								
-								var startAngle = Math.atan2(previous.y - realCenterY, previous.x - realCenterX);
-								var endAngle = Math.atan2(point.y - realCenterY, point.x - realCenterX);
+								startAngle = Math.atan2(previous.y - realCenterY, previous.x - realCenterX);
+								endAngle = Math.atan2(point.y - realCenterY, point.x - realCenterX);
 								
 								startAngle += startAngle < 0 ? 2 * Math.PI: 0;
 								endAngle += endAngle < 0 ? 2 * Math.PI : 0;
@@ -443,8 +446,8 @@
 								var imagCenterX = this.scale.drawCenterX + (this.scale.drawingArea / 2); // far right side of the drawing area
 								var imagCenterY = point.value.imag > 0 ? this.scale.drawCenterY - imagRadius : this.scale.drawCenterY + imagRadius;
 								
-								var startAngle = Math.atan2(previous.y - imagCenterY, previous.x - imagCenterX);
-								var endAngle = Math.atan2(point.y - imagCenterY, point.x - imagCenterX);
+								startAngle = Math.atan2(previous.y - imagCenterY, previous.x - imagCenterX);
+								endAngle = Math.atan2(point.y - imagCenterY, point.x - imagCenterX);
 								
 								startAngle += startAngle < 0 ? 2 * Math.PI: 0;
 								endAngle += endAngle < 0 ? 2 * Math.PI : 0;
