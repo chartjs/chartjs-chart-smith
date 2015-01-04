@@ -239,6 +239,8 @@
 							ctx.save();
 							ctx.translate(label.x, label.y);
 							ctx.rotate(-0.5 * Math.PI);
+							ctx.textBaseline = 'middle';
+							ctx.textAlign = "center";
 							ctx.fillText(label.text, 0, 0);
 							prevX = label.x;
 							prevY = label.y;
@@ -252,6 +254,7 @@
 							ctx.translate(label.x, label.y);
 							ctx.rotate(ang);
 							ctx.textBaseline = 'middle';
+							ctx.textAlign = "left";
 							ctx.fillText(label.text, 2, 0);
 							ctx.restore();
 						}, this);
