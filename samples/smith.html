@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<title>Smith Chart</title>
-		<script src="https://rawgit.com/nnnick/Chart.js/master/Chart.js"></script>
-		<script src="../src/Chart.smith.js"></script>
+		<script src="../node_modules/chart.js/Chart.js"></script>
+		<script src="../Chart.smith.js"></script>
 		<style>
 			body{
 				padding: 0;
@@ -25,7 +25,7 @@
 			var ctx = document.getElementById("chart-area").getContext("2d");
 			window.myDoughnut = new Chart(ctx).Doughnut(doughnutData, {responsive : true});
 		};*/
-		var smithData = {
+		/*var smithData = {
 			datasets : [
 				{
 					label: "My Trace",
@@ -54,13 +54,26 @@
 					]
 				}
 			]
-		};
+		};*/
 		
 		window.onload = function() {
 			var ctx = document.getElementById("chart-area").getContext("2d");
-			window.mySmith = new Chart(ctx).SmithChart(smithData, {
+			/*window.mySmith = new Chart(ctx).SmithChart(smithData, {
 				responsive: true
-			});
+			});*/
+			window.mySmith = new Chart(ctx, {
+				type: 'smith',
+				options: {},
+				data: {
+					datasets: [{
+						label: 'My Dataset',
+						data: [ { real : 1.0, imag : 2.0}, 
+							{ real : 1.0, imag : 1.0},
+							{ real : 1.0, imag : -1.0}
+						]
+					}]
+				}
+			})
 		};
 	</script>
 	</body>
