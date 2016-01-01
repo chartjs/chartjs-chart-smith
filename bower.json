@@ -8,6 +8,6 @@
     "Chart.Smith.js"
   ],
   "dependencies": {
-	"Chart.js": "1.0.0-beta"
+    "Chart.js": ">=2.0.0-beta2"
   }
 }
