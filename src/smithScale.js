@@ -59,91 +59,72 @@
 				//
 				// The center point and radius will need to be scaled based on the size of the canvas
 
-				// Draw each of the circles
-				helpers.each(this.rTicks, function(r, rIndex) {
-					var radius = 1 / (1 + r) * (this.minDimension / 2); // scale for the min dimension
-					var x = this.xCenter + ((r / (1 + r)) * (this.minDimension / 2));
+				if (this.options.gridLines.display) {
+					this.ctx.strokeStyle = this.options.gridLines.color;
+					this.ctx.lineWidth = this.options.gridLines.lineWidth;
 
+					// Draw each of the circles
+					helpers.each(this.rTicks, function(r, rIndex) {
+						var radius = 1 / (1 + r) * (this.minDimension / 2); // scale for the min dimension
+						var x = this.xCenter + ((r / (1 + r)) * (this.minDimension / 2));
+
+						this.ctx.beginPath();
+						this.ctx.arc(x, this.yCenter, radius, 0, 2 * Math.PI);
+						this.ctx.closePath();
+						this.ctx.stroke();
+					}, this);
+
+					// Now we need to draw the impedance circles.
+					// From the same source as above, these have the following properties:
+					// Center : { 1, 1 / x}
+					// Radius : 1 / x
+					//
+					// The discontinuity at x === 0 should be noted. This produces a flat line across the middle of the drawing area
+					//
+
+					helpers.each(this.xTicks, function(x) {
+						if (x === 0) {
+							// 0 Special case
+							this.ctx.beginPath();
+							this.ctx.moveTo(this.xCenter - (this.minDimension / 2), this.yCenter);
+							this.ctx.lineTo(this.xCenter + (this.minDimension / 2), this.yCenter);
+							this.ctx.stroke();
+						} else {
+							var xRadius = (1 / Math.abs(x)) * (this.minDimension / 2);
+							var xCoord = this.xCenter + (this.minDimension / 2); // far right side of the drawing area
+							var yCoord = x > 0 ? this.yCenter - xRadius : this.yCenter + xRadius;
+
+							// Ok, these circles are a pain. They need to only be drawn in the region that intersects the resistance == 0 circle. This circle has a 
+							// radius of 0.5 * this.minDimension and is centered at (xCenter, yCenter)
+							// We will solve the intersection in polar coordinates and define the center of our coordinate system as the center of the xCircle, ie (xCoord, yCoord)
+
+							var r0 = Math.sqrt(Math.pow(xCoord - this.xCenter, 2) + Math.pow(yCoord - this.yCenter, 2));
+							var phi0 = Math.atan2(this.yCenter - yCoord, this.xCenter - xCoord);
+
+							// A circle with center location r0,phi0 with radius a is defined in polar coordinates by the equation
+							// r = r0 * cos(phi - phi0) + sqrt(a^2 - ((r0^2) * sin^2(phi - phi0)))
+							// Our xCircle is defined by r = xRadius because of where we defined the 0,0 point
+							// Solving the intersection of these equations yields
+							// phi = 0.5 * arccos((xRadius^2 - a^2) / (r0^2)) + phi0
+							var arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.minDimension / 2, 2)) / Math.pow(r0, 2));
+							var phi2 = ((x > 0 ? 0.5 : -0.5) * arccos) + phi0;
+							var startAngle = x > 0 ? 0.5 * Math.PI : -0.5 * Math.PI;
+
+							this.ctx.beginPath();
+							this.ctx.arc(xCoord, yCoord, xRadius, startAngle, phi2, x > 0 ? false : true);
+							this.ctx.stroke();
+						}
+					}, this);
+				} else {
+					// Simply draw a border line
+					this.ctx.strokeStyle = this.options.gridLines.color;
+					this.ctx.lineWidth = this.options.gridLines.lineWidth;
 					this.ctx.beginPath();
-					this.ctx.arc(x, this.yCenter, radius, 0, 2 * Math.PI);
-					this.ctx.closePath();
+					this.ctx.arc(this.xCenter, this.yCenter, this.minDimension / 2, 0, 2 * Math.PI, false);
 					this.ctx.stroke();
-				}, this);
+				}
 
-				// Now we need to draw the impedance circles.
-				// From the same source as above, these have the following properties:
-				// Center : { 1, 1 / x}
-				// Radius : 1 / x
-				//
-				// The discontinuity at x === 0 should be noted. This produces a flat line across the middle of the drawing area
-				//
-				// For each of the xCircles, both the positive and negative versions must be drawn as the reactance can be either positive or negative
-				/*var xCircles = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0, 50.0];
-
-				// 0 Special case
-				ctx.beginPath();
-				ctx.moveTo(this.drawCenterX - (this.drawingArea / 2), this.drawCenterY);
-				ctx.lineTo(this.drawCenterX + (this.drawingArea / 2), this.drawCenterY);
-				ctx.stroke();
-				ctx.closePath();
-
-				helpers.each(xCircles, function(x, xIndex) {
-					// Draw the positive circle
-					var xRadius = (1 / x) * (this.drawingArea / 2);
-					var xCoord = this.drawCenterX + (this.drawingArea / 2); // far right side of the drawing area
-					var yCoord = this.drawCenterY - xRadius;
-
-					// Ok, these circles are a pain. They need to only be drawn in the region that intersects the resistance == 0 circle. This circle has a radius of 0.5 * this.drawingArea and is
-					// centered at (drawCenterX, drawCenterY)
-
-					// We will solve the intersection in polar coordinates and define the center of our coordinate system as the center of the xCircle, ie (xCoord, yCoord)
-					var r0 = Math.sqrt(Math.pow(xCoord - this.drawCenterX, 2) + Math.pow(yCoord - this.drawCenterY, 2));
-					var phi0 = Math.atan2(this.drawCenterY - yCoord, this.drawCenterX - xCoord);
-
-					// A circle with center location r0,phi0 with radius a is defined in polar coordinates by the equation
-					// r = r0 * cos(phi - phi0) + sqrt(a^2 - ((r0^2) * sin^2(phi - phi0)))
-					// Our xCircle is defined by r = xRadius because of where we defined the 0,0 point
-					// Solving the intersection of these equations yields
-					// phi = 0.5 * arccos((xRadius^2 - a^2) / (r0^2)) + phi0
-					var arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.drawingArea / 2, 2)) / Math.pow(r0, 2));
-					var phi2 = (0.5 * arccos) + phi0;
-
-					ctx.beginPath();
-					// These lines are always above the horizontal and always begin at 90 degrees
-					ctx.arc(xCoord, yCoord, xRadius, Math.PI / 2, phi2, false); // always draw counterclockwise for these arcs
-					ctx.stroke();
-					ctx.closePath();
-
-					if (this.showLabels) {
-						this.xLabels.push({
-							x: xCoord + (Math.cos(phi2) * xRadius),
-							y: yCoord + (Math.sin(phi2) * xRadius),
-							text: x
-						});
-					}
-
-					// Negative circle
-					yCoord = this.drawCenterY + xRadius;
-					r0 = Math.sqrt(Math.pow(xCoord - this.drawCenterX, 2) + Math.pow(yCoord - this.drawCenterY, 2));
-					phi0 = Math.atan2(this.drawCenterY - yCoord, this.drawCenterX - xCoord); // atan2 should always return an angle in [-PI/2, 0) for these circles
-					arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.drawingArea / 2, 2)) / Math.pow(r0, 2));
-					phi2 = (-0.5 * arccos) + phi0;
-
-					ctx.beginPath();
-					ctx.arc(xCoord, yCoord, xRadius, -1 / 2 * Math.PI, phi2, true);
-					ctx.stroke();
-					ctx.closePath();
-
-					if (this.showLabels) {
-						this.xLabels.push({
-							x: xCoord + (Math.cos(phi2) * xRadius),
-							y: yCoord + (Math.sin(phi2) * xRadius),
-							text: x
-						});
-					}
-				}, this);
-
-				ctx.fillStyle = this.textColor;
+				/*ctx.fillStyle = this.textColor;
 				ctx.font = this.font;
 
 				// Rotate canvas so that text is draw in correct orientation
