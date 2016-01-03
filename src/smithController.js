@@ -4,12 +4,24 @@
 	Chart.defaults.smith = {
 		scale: {
 			type: 'smith'
+		},
+		tooltips: {
+			callbacks: {
+				title: function() {
+					return null;
+				},
+				label: function(bodyItem, data) {
+					var dataset = data.datasets[bodyItem.datasetIndex];
+					var d = dataset.data[bodyItem.index];
+					return dataset.label + ": " + d.real + ' + ' + d.imag + 'i';
+				}
+			}
 		}
 	};
 
 	Chart.controllers.smith = Chart.controllers.line.extend({
 		// Not needed since there is only a single scale
-		linkScales: helpers.noop, 
+		linkScales: helpers.noop,
 
 		update: function(reset) {
 			var line = this.getDataset().metaDataset;
@@ -33,7 +45,7 @@
 					borderDashOffset: line.custom && line.custom.borderDashOffset ? line.custom.borderDashOffset : (this.getDataset().borderDashOffset || this.chart.options.elements.line.borderDashOffset),
 					borderJoinStyle: line.custom && line.custom.borderJoinStyle ? line.custom.borderJoinStyle : (this.getDataset().borderJoinStyle || this.chart.options.elements.line.borderJoinStyle),
 					fill: line.custom && line.custom.fill ? line.custom.fill : (this.getDataset().fill !== undefined ? this.getDataset().fill : this.chart.options.elements.line.fill),
-					
+
 					// Scale
 					scaleZero: {
 						x: this.chart.scale.xCenter,
