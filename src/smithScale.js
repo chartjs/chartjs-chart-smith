@@ -56,8 +56,42 @@
 			var fontSize = helpers.getValueOrDefault(this.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
 
 			if (this.options.ticks.display) {
-				// Displaying ticks. We need to pull in the scale by the right amount
-				this.paddingTop = this.padddingBottom = 1.5 * fontSize;
+				var fontStyle = helpers.getValueOrDefault(this.options.ticks.fontStyle, Chart.defaults.global.defaultFontStyle);
+				var fontFamily = helpers.getValueOrDefault(this.options.ticks.fontFamily, Chart.defaults.global.defaultFontFamily);
+				var labelFont = helpers.fontString(fontSize, fontStyle, fontFamily);
+				this.ctx.font = labelFont;
+
+				var xLabelLengths = this.xLabels.map(function(tick) {
+					return this.ctx.measureText(tick).width;
+				}, this);
+
+				// Figure out where these points will go, and assuming they are drawn there, how much will it go outside of the chart area.
+				// We use that to determine how much padding we nede on each side
+				this.minDimension = Math.min(this.right - this.left, this.bottom - this.top);
+
+				helpers.each(this.xTicks, function(xTick, index) {
+					if (xTick !== 0) {
+						var halfDimension = this.minDimension / 2;
+						var labelStart = this.getPointPosition(0, xTick);
+						var cosPhi = (labelStart.x - this.xCenter) / halfDimension;
+						var sinPhi = (labelStart.y - this.yCenter) / halfDimension;
+						var labelWidth = xLabelLengths[index] + this.options.ticks.padding;
+						var pts = [{
+							x: labelStart.x + (cosPhi * labelWidth) + (sinPhi * fontSize),
+							y: labelStart.y + (sinPhi * labelWidth) - (cosPhi * fontSize)
+						}, {
+							x: labelStart.x + (cosPhi * labelWidth) - (sinPhi * fontSize),
+							y: labelStart.y + (sinPhi * labelWidth) + (cosPhi * fontSize)
+						}];
+
+						helpers.each(pts, function(pt) {
+							this.paddingLeft = Math.max(this.paddingLeft, this.left - pt.x);
+							this.paddingTop = Math.max(this.paddingTop, this.top - pt.y);
+							this.paddingRight = Math.max(this.paddingRight, pt.x - this.right);
+							this.paddingBottom = Math.max(this.paddingBottom, pt.y - this.bottom);
+						}, this);
+					}
+				}, this);
 			}
 
 			this.minDimension = Math.min(this.right - this.left - this.paddingLeft - this.paddingRight, this.bottom - this.top - this.paddingBottom - this.paddingTop);
@@ -190,13 +224,20 @@
 						if (pt) {
 							var align = 'left'
 							var ang = Math.atan2(pt.y - this.yCenter, pt.x - this.xCenter);
+							var textPadding = this.options.ticks.padding;
+
+							if (pt.x < this.xCenter) {
+								ang += Math.PI;
+								align = 'right';
+								textPadding *= -1;
+							}
 
 							this.ctx.save();
 							this.ctx.translate(pt.x, pt.y);
 							this.ctx.rotate(ang);
 							this.ctx.textBaseline = 'middle';
 							this.ctx.textAlign = align;
-							this.ctx.fillText(xLabel, this.options.ticks.padding, 0);
+							this.ctx.fillText(xLabel, textPadding, 0);
 							this.ctx.restore();
 						}
 					}, this);
