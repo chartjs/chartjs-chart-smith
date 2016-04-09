@@ -14,7 +14,7 @@
 				return tick.toString();
 			},
 			xCallback: function(tick) {
-				return tick.toString();
+				return tick.toString() + 'i';
 			}
 		}
 	};
