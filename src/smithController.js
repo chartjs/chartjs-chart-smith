@@ -65,26 +65,23 @@
 		updateElement: function(point, index, reset) {
 			var scale = this.chart.scale;
 
-			helpers.extend(point, {
-				// Utility
-				_chart: this.chart.chart,
-				_datasetIndex: this.index,
-				_index: index,
+			// Utility
+			point._chart = this.chart.chart;
+			point._datasetIndex = this.index;
+			point._index = index;
 
-				// Desired view properties
-				_model: {
-					x: reset ? scale.xCenter : this.calculatePointX(index),
-					y: reset ? scale.yCenter : this.calculatePointY(index),
-					// Appearance
-					tension: point.custom && point.custom.tension ? point.custom.tension : helpers.getValueOrDefault(this.getDataset().tension, this.chart.options.elements.line.tension),
-					radius: point.custom && point.custom.radius ? point.custom.radius : helpers.getValueAtIndexOrDefault(this.getDataset().radius, index, this.chart.options.elements.point.radius),
-					backgroundColor: this.getPointBackgroundColor(point, index),
-					borderColor: this.getPointBorderColor(point, index),
-					borderWidth: this.getPointBorderWidth(point, index),
-					// Tooltip
-					hitRadius: point.custom && point.custom.hitRadius ? point.custom.hitRadius : helpers.getValueAtIndexOrDefault(this.getDataset().hitRadius, index, this.chart.options.elements.point.hitRadius),
-				},
-			});
+			point._model = {
+				x: reset ? scale.xCenter : this.calculatePointX(index),
+				y: reset ? scale.yCenter : this.calculatePointY(index),
+				// Appearance
+				tension: point.custom && point.custom.tension ? point.custom.tension : helpers.getValueOrDefault(this.getDataset().tension, this.chart.options.elements.line.tension),
+				radius: point.custom && point.custom.radius ? point.custom.radius : helpers.getValueAtIndexOrDefault(this.getDataset().radius, index, this.chart.options.elements.point.radius),
+				backgroundColor: this.getPointBackgroundColor(point, index),
+				borderColor: this.getPointBorderColor(point, index),
+				borderWidth: this.getPointBorderWidth(point, index),
+				// Tooltip
+				hitRadius: point.custom && point.custom.hitRadius ? point.custom.hitRadius : helpers.getValueAtIndexOrDefault(this.getDataset().hitRadius, index, this.chart.options.elements.point.hitRadius),
+			};
 
 			point._model.skip = point.custom && point.custom.skip ? point.custom.skip : (isNaN(point._model.x) || isNaN(point._model.y));
 		},

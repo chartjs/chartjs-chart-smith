@@ -23,8 +23,8 @@
 		setDimensions: function() {
 			this.height = this.maxHeight;
 			this.width = this.maxWidth;
-			this.xCenter = Math.round(this.width / 2);
-			this.yCenter = Math.round(this.height / 2);
+			this.xCenter = this.left + Math.round(this.width / 2);
+			this.yCenter = this.top + Math.round(this.height / 2);
 
 			this.paddingLeft = 0;
 			this.paddingTop = 0;
@@ -53,10 +53,11 @@
 		fit: function() {
 			this.xCenter = (this.left + this.right) / 2;
 			this.yCenter = (this.top + this.bottom) / 2;
+			var fontSize = helpers.getValueOrDefault(this.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
 
 			if (this.options.ticks.display) {
 				// Displaying ticks. We need to pull in the scale by the right amount
-				this.paddingTop = this.padddingBottom = 1.5 * this.options.ticks.fontSize;
+				this.paddingTop = this.padddingBottom = 1.5 * fontSize;
 			}
 
 			this.minDimension = Math.min(this.right - this.left - this.paddingLeft - this.paddingRight, this.bottom - this.top - this.paddingBottom - this.paddingTop);
@@ -162,9 +163,14 @@
 				}
 
 				if (this.options.ticks.display) {
-					this.ctx.fillStyle = this.options.ticks.fontColor;
-					var labelFont = helpers.fontString(this.options.ticks.fontSize, this.options.ticks.fontStyle, this.options.ticks.fontFamily);
+					var fontSize = helpers.getValueOrDefault(this.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
+					var fontStyle = helpers.getValueOrDefault(this.options.ticks.fontStyle, Chart.defaults.global.defaultFontStyle);
+					var fontFamily = helpers.getValueOrDefault(this.options.ticks.fontFamily, Chart.defaults.global.defaultFontFamily);
+
+					var labelFont = helpers.fontString(fontSize, fontStyle, fontFamily);
 					this.ctx.font = labelFont;
+
+					this.ctx.fillStyle = helpers.getValueOrDefault(this.options.ticks.fontColor, Chart.defaults.global.defaultFontColor);
 
 					helpers.each(this.rLabels, function(rLabel, index) {
 						var pt = this.rLabelPoints[index];

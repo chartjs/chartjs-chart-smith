@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Smith Chart</title>
-		<script src="../node_modules/chart.js/Chart.js"></script>
+		<script src="../node_modules/chart.js/dist/Chart.js"></script>
 		<script src="../Chart.smith.js"></script>
 		<style>
 			body{
@@ -58,9 +58,6 @@
 		
 		window.onload = function() {
 			var ctx = document.getElementById("chart-area").getContext("2d");
-			/*window.mySmith = new Chart(ctx).SmithChart(smithData, {
-				responsive: true
-			});*/
 			window.mySmith = new Chart(ctx, {
 				type: 'smith',
 				options: {},
