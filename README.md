@@ -1,5 +1,5 @@
 # Chart.Smith.js
-[![Build Status](https://travis-ci.org/etimberg/Chart.smith.js.svg?branch=master)](https://travis-ci.org/etimberg/Chart.smith.js)
+[![Build Status](https://travis-ci.org/chartjs/Chart.smith.js.svg?branch=master)](https://travis-ci.org/chartjs/Chart.smith.js)
 
 Provides a Smith Chart for use with [Chart.js](http://www.chartjs.org)
 
