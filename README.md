@@ -1,4 +1,5 @@
 # Chart.Smith.js
+[![Build Status](https://travis-ci.org/etimberg/Chart.smith.js.svg?branch=master)](https://travis-ci.org/etimberg/Chart.smith.js)
 
 *Smith Chart extension for Chart.js* [chartjs.org](http://www.chartjs.org)
 
