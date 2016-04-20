@@ -1,7 +1,7 @@
 module.exports = function(config) {
 	var configuration = {
 		browsers: ['Firefox'],
-		files: ['./node_modules/Chart.js/dist/Chart.js', './node_modules/Chart.js/test/mockContext.js', './src/**/*.js', './test/**/*.js'],
+		files: ['./node_modules/chart.js/dist/Chart.js', './node_modules/chart.js/test/mockContext.js', './src/**/*.js', './test/**/*.js'],
 		frameworks: ['jasmine'],
 		reporters: ['progress', 'kjhtml'],
 	};
