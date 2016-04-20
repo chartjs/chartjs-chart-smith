@@ -19,6 +19,10 @@
 		}
 	};
 
+	function roundTo1Decimal(a) {
+		return Math.round(a * 10) / 10;
+	}
+
 	Chart.controllers.smith = Chart.controllers.line.extend({
 		// Not needed since there is only a single scale
 		linkScales: helpers.noop,
@@ -61,6 +65,14 @@
 			}, this);
 
 			this.updateBezierControlPoints();
+
+			// fix points
+			helpers.each(points, function(point) {
+				point._model.controlPointPreviousX = roundTo1Decimal(point._model.controlPointPreviousX);
+				point._model.controlPointPreviousY = roundTo1Decimal(point._model.controlPointPreviousY);
+				point._model.controlPointNextX = roundTo1Decimal(point._model.controlPointNextX);
+				point._model.controlPointNextY = roundTo1Decimal(point._model.controlPointNextY);
+			});
 		},
 		updateElement: function(point, index, reset) {
 			var scale = this.chart.scale;
@@ -76,12 +88,16 @@
 				// Appearance
 				tension: point.custom && point.custom.tension ? point.custom.tension : helpers.getValueOrDefault(this.getDataset().tension, this.chart.options.elements.line.tension),
 				radius: point.custom && point.custom.radius ? point.custom.radius : helpers.getValueAtIndexOrDefault(this.getDataset().radius, index, this.chart.options.elements.point.radius),
+				pointStyle: point.custom && point.custom.pointStyle ? point.custom.pointStyle : helpers.getValueAtIndexOrDefault(this.getDataset().pointStyle, index, this.chart.options.elements.point.pointStyle),
 				backgroundColor: this.getPointBackgroundColor(point, index),
 				borderColor: this.getPointBorderColor(point, index),
 				borderWidth: this.getPointBorderWidth(point, index),
 				// Tooltip
 				hitRadius: point.custom && point.custom.hitRadius ? point.custom.hitRadius : helpers.getValueAtIndexOrDefault(this.getDataset().hitRadius, index, this.chart.options.elements.point.hitRadius),
 			};
+
+			point._model.x = roundTo1Decimal(point._model.x);
+			point._model.y = roundTo1Decimal(point._model.y);
 
 			point._model.skip = point.custom && point.custom.skip ? point.custom.skip : (isNaN(point._model.x) || isNaN(point._model.y));
 		},

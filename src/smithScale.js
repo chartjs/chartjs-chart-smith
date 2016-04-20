@@ -262,8 +262,8 @@
 			// We have an r and a phi from the point (imagCenterX, imagCenterY)
 			// translate to an x and a undefined
 			return {
-				x: (Math.cos(phi) * imagRadius) + imagCenterX,
-				y: (Math.sin(phi) * imagRadius) + imagCenterY
+				x: imag === 0 ? realCenterX - realRadius : (Math.cos(phi) * imagRadius) + imagCenterX,
+				y: imag === 0 ? this.yCenter : (Math.sin(phi) * imagRadius) + imagCenterY
 			};
 		},
 		getLabelForIndex: function(index, datasetIndex) {

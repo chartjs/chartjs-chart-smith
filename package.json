@@ -9,7 +9,7 @@
     "url": "https://github.com/etimberg/Chart.Smith.js.git"
   },
   "dependencies": {
-    "chart.js": "^2.0.0"
+    "chart.js": "^2.0.2"
   },
   "devDependencies": {
     "check-dependencies": "^0.11.0",
@@ -19,6 +19,13 @@
     "gulp-replace": ">=0.5.4",
     "gulp-umd": ">=0.2.0",
     "gulp-util": ">=3.0.7",
-    "jshint": "^2.9.1-rc2"
+    "jasmine": "^2.4.1",
+    "jshint": "^2.9.1-rc2",
+    "karma": "^0.13.22",
+    "karma-chrome-launcher": "^0.2.3",
+    "karma-coverage": "^0.5.5",
+    "karma-firefox-launcher": "^0.1.7",
+    "karma-jasmine": "^0.3.8",
+    "karma-jasmine-html-reporter": "^0.2.0"
   }
 }
