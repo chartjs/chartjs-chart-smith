@@ -1,5 +1,6 @@
 var concat = require('gulp-concat'),
 	gulp = require('gulp'),
+	insert = require('gulp-insert'),
 	jshint = require('gulp-jshint'),
 	karma = require('karma'),
 	package = require('./package.json'),
@@ -13,6 +14,15 @@ var testFiles = './test/**.js';
 var buildDir = '.';
 var testSrc = ['./node_modules/Chart.js/dist/Chart.js', srcFiles, testFiles];
 
+var header = "/*!\n\
+ * Chart.Smith.js\n\
+ * Version: {{ version }}\n\
+ *\n\
+ * Copyright 2016 Evert Timberg\n\
+ * Released under the MIT license\n\
+ * https://github.com/chartjs/Chart.Smith.js/blob/master/LICENSE.md\n\
+ */\n";
+
 gulp.task('build', buildTask);
 gulp.task('ci', ['jshint', 'test']); // runs on CI
 gulp.task('coverage', coverageTask);
@@ -24,13 +34,14 @@ gulp.task('testWatch', testWatchTask);
 function buildTask() {
 	return gulp.src(srcFiles)
 		.pipe(concat('Chart.Smith.js'))
-		.pipe(replace('{{ version }}', package.version))
 		.pipe(umd({
 			templateName: 'amdCommonWeb',
 			dependencies: function() {
 				return ['Chart']
 			}
 		}))
+		.pipe(insert.prepend(header))
+		.pipe(replace('{{ version }}', package.version))
 		.pipe(gulp.dest(buildDir));
 }
 

@@ -1,3 +1,11 @@
+/*!
+ * Chart.Smith.js
+ * Version: 0.1.1
+ *
+ * Copyright 2016 Evert Timberg
+ * Released under the MIT license
+ * https://github.com/chartjs/Chart.Smith.js/blob/master/LICENSE.md
+ */
 ;(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define(['Chart'], factory);
