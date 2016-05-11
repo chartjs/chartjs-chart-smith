@@ -6,13 +6,22 @@ describe('Smith controller tests', function() {
 				datasets: [{
 					data: []
 				}]
-			}
+			},
+			getDatasetMeta: function(datasetIndex) {
+				this.data.datasets[datasetIndex].meta = this.data.datasets[datasetIndex].meta || {
+					data: [],
+					dataset: null
+				};
+				return this.data.datasets[datasetIndex].meta;
+			},
 		};
 
 		var controller = new Chart.controllers.smith(chart, 0);
 		expect(controller).not.toBe(undefined);
 		expect(controller.index).toBe(0);
-		expect(chart.data.datasets[0].metaData).toEqual([]);
+
+		var meta = chart.getDatasetMeta(0);
+		expect(meta.data).toEqual([]);
 
 		controller.updateIndex(1);
 		expect(controller.index).toBe(1);
@@ -37,6 +46,13 @@ describe('Smith controller tests', function() {
 					}]
 				}]
 			},
+			getDatasetMeta: function(datasetIndex) {
+				this.data.datasets[datasetIndex].meta = this.data.datasets[datasetIndex].meta || {
+					data: [],
+					dataset: null
+				};
+				return this.data.datasets[datasetIndex].meta;
+			},
 			config: {
 				type: 'smith'
 			},
@@ -44,12 +60,13 @@ describe('Smith controller tests', function() {
 
 		var controller = new Chart.controllers.smith(chart, 0);
 
-		expect(chart.data.datasets[0].metaData.length).toBe(4); // 4 points created
-		expect(chart.data.datasets[0].metaData[0] instanceof Chart.elements.Point).toBe(true);
-		expect(chart.data.datasets[0].metaData[1] instanceof Chart.elements.Point).toBe(true);
-		expect(chart.data.datasets[0].metaData[2] instanceof Chart.elements.Point).toBe(true);
-		expect(chart.data.datasets[0].metaData[3] instanceof Chart.elements.Point).toBe(true);
-		expect(chart.data.datasets[0].metaDataset instanceof Chart.elements.Line).toBe(true); // 1 line element
+		var meta = chart.getDatasetMeta(0);
+		expect(meta.data.length).toBe(4); // 4 points created
+		expect(meta.data[0] instanceof Chart.elements.Point).toBe(true);
+		expect(meta.data[1] instanceof Chart.elements.Point).toBe(true);
+		expect(meta.data[2] instanceof Chart.elements.Point).toBe(true);
+		expect(meta.data[3] instanceof Chart.elements.Point).toBe(true);
+		expect(meta.dataset instanceof Chart.elements.Line).toBe(true); // 1 line element
 	});
 
 	it('should update elements', function() {
@@ -79,7 +96,7 @@ describe('Smith controller tests', function() {
 			ctx: mockContext,
 			options: scaleConfig,
 			chart: {
-				data: data
+				data: data,
 			}
 		});
 
@@ -126,14 +143,23 @@ describe('Smith controller tests', function() {
 					}
 				},
 			},
-			scale: scale
+			scale: scale,
+			getDatasetMeta: function(datasetIndex) {
+				this.data.datasets[datasetIndex].meta = this.data.datasets[datasetIndex].meta || {
+					data: [],
+					dataset: null
+				};
+				return this.data.datasets[datasetIndex].meta;
+			},
 		};
 
 		var controller = new Chart.controllers.smith(chart, 0);
 		controller.update();
 
+		var meta = chart.getDatasetMeta(0);
+
 		// Line element
-		expect(chart.data.datasets[0].metaDataset._model).toEqual({
+		expect(meta.dataset._model).toEqual({
 			backgroundColor: 'rgb(255, 0, 0)',
 			borderCapStyle: 'round',
 			borderColor: 'rgb(0, 255, 0)',
@@ -150,7 +176,7 @@ describe('Smith controller tests', function() {
 			},
 		});
 
-		expect(chart.data.datasets[0].metaData[0]._model).toEqual({
+		expect(meta.data[0]._model).toEqual({
 			backgroundColor: Chart.defaults.global.defaultColor,
 			borderWidth: 1,
 			borderColor: Chart.defaults.global.defaultColor,
@@ -171,7 +197,7 @@ describe('Smith controller tests', function() {
 			controlPointNextY: 200
 		});
 
-		expect(chart.data.datasets[0].metaData[1]._model).toEqual({
+		expect(meta.data[1]._model).toEqual({
 			x: 200,
 			y: 200,
 			tension: 0.1,
@@ -188,7 +214,7 @@ describe('Smith controller tests', function() {
 			controlPointNextY: 199.4
 		});
 
-		expect(chart.data.datasets[0].metaData[2]._model).toEqual({
+		expect(meta.data[2]._model).toEqual({
 			x: 210.2,
 			y: 179.6,
 			tension: 0.1,
@@ -205,7 +231,7 @@ describe('Smith controller tests', function() {
 			controlPointNextY: 180.9
 		});
 
-		expect(chart.data.datasets[0].metaData[3]._model).toEqual({
+		expect(meta.data[3]._model).toEqual({
 			backgroundColor: Chart.defaults.global.defaultColor,
 			borderWidth: 1,
 			borderColor: Chart.defaults.global.defaultColor,
@@ -246,7 +272,7 @@ describe('Smith controller tests', function() {
 
 		controller.update();
 
-		expect(chart.data.datasets[0].metaDataset._model).toEqual({
+		expect(meta.dataset._model).toEqual({
 			backgroundColor: 'rgb(98, 98, 98)',
 			borderCapStyle: 'butt',
 			borderColor: 'rgb(8, 8, 8)',
@@ -263,7 +289,7 @@ describe('Smith controller tests', function() {
 			},
 		});
 
-		expect(chart.data.datasets[0].metaData[0]._model).toEqual({
+		expect(meta.data[0]._model).toEqual({
 			tension: 0,
 			radius: 22,
 			pointStyle: 'circle',
@@ -284,7 +310,7 @@ describe('Smith controller tests', function() {
 			controlPointNextY: 200
 		});
 
-		expect(chart.data.datasets[0].metaData[1]._model).toEqual({
+		expect(meta.data[1]._model).toEqual({
 			x: 200,
 			y: 200,
 			tension: 0,
@@ -301,7 +327,7 @@ describe('Smith controller tests', function() {
 			controlPointNextY: 200
 		});
 
-		expect(chart.data.datasets[0].metaData[2]._model).toEqual({
+		expect(meta.data[2]._model).toEqual({
 			backgroundColor: 'rgb(128, 129, 130)',
 			borderWidth: 1.123,
 			borderColor: 'rgb(56, 57, 58)',
@@ -322,7 +348,7 @@ describe('Smith controller tests', function() {
 			controlPointNextY: 179.6,
 		});
 
-		expect(chart.data.datasets[0].metaData[3]._model).toEqual({
+		expect(meta.data[3]._model).toEqual({
 			backgroundColor: 'rgb(128, 129, 130)',
 			borderWidth: 1.123,
 			borderColor: 'rgb(56, 57, 58)',
@@ -344,7 +370,7 @@ describe('Smith controller tests', function() {
 		});
 
 		// Use custom styles for lines & first point
-		chart.data.datasets[0].metaDataset.custom = {
+		meta.dataset.custom = {
 			tension: 0.25,
 			backgroundColor: 'rgb(55, 55, 54)',
 			borderColor: 'rgb(8, 7, 6)',
@@ -357,7 +383,7 @@ describe('Smith controller tests', function() {
 		};
 
 		// point styles
-		chart.data.datasets[0].metaData[0].custom = {
+		meta.data[0].custom = {
 			radius: 2.2,
 			backgroundColor: 'rgb(0, 1, 3)',
 			borderColor: 'rgb(4, 6, 8)',
@@ -369,7 +395,7 @@ describe('Smith controller tests', function() {
 
 		controller.update();
 
-		expect(chart.data.datasets[0].metaDataset._model).toEqual({
+		expect(meta.dataset._model).toEqual({
 			backgroundColor: 'rgb(55, 55, 54)',
 			borderCapStyle: 'square',
 			borderColor: 'rgb(8, 7, 6)',
@@ -386,7 +412,7 @@ describe('Smith controller tests', function() {
 			},
 		});
 
-		expect(chart.data.datasets[0].metaData[0]._model).toEqual({
+		expect(meta.data[0]._model).toEqual({
 			x: 149,
 			y: 200,
 			tension: 0.15,
@@ -399,7 +425,7 @@ describe('Smith controller tests', function() {
 			skip: true,
 			controlPointPreviousX: 149,
 			controlPointPreviousY: 200,
-			controlPointNextX: 156.7,
+			controlPointNextX: 161.8,
 			controlPointNextY: 200
 		});
 	});

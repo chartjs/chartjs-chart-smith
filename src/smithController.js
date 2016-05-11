@@ -28,8 +28,9 @@
 		linkScales: helpers.noop,
 
 		update: function(reset) {
-			var line = this.getDataset().metaDataset;
-			var points = this.getDataset().metaData;
+			var meta = this.getMeta();
+			var line = meta.dataset;
+			var points = meta.data;
 
 			// Update Line
 			helpers.extend(line, {

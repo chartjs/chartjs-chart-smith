@@ -13,11 +13,12 @@ describe('Smith Scale', function() {
 			display: true,
 			gridLines: {
 				color: "rgba(0, 0, 0, 0.1)",
+				display: true,
 				drawOnChartArea: true,
 				drawTicks: true, // draw ticks extending towards the label
 				lineWidth: 1,
 				offsetGridLines: false,
-				display: true,
+				tickMarkLength: 10,
 				zeroLineColor: "rgba(0,0,0,0.25)",
 				zeroLineWidth: 1,
 			},
@@ -33,7 +34,7 @@ describe('Smith Scale', function() {
 				padding: 5,
 				reverse: false,
 				display: true,
-				callback: defaultConfig.ticks.callback, // make this work nicer, then check below
+				callback: jasmine.any(Function),
 				rCallback: jasmine.any(Function),
 				xCallback: jasmine.any(Function),
 				autoSkip: true,
