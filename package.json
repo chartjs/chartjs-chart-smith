@@ -5,7 +5,7 @@
   },
   "description": "Smith chart implementation for Chart.js",
   "main": "Chart.Smith.js",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/etimberg/Chart.Smith.js.git"
