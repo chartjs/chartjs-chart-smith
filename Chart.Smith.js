@@ -1,6 +1,6 @@
 /*!
  * Chart.Smith.js
- * Version: 0.1.1
+ * Version: 0.2.0
  *
  * Copyright 2016 Evert Timberg
  * Released under the MIT license
