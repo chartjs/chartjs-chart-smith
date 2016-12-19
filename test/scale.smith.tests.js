@@ -9,18 +9,21 @@ describe('Smith Scale', function() {
 	it('Should have the correct default config', function() {
 		var defaultConfig = Chart.scaleService.getScaleDefaults('smith');
 
-		expect(defaultConfig).toEqual({
+		expect(defaultConfig).toEqual(jasmine.objectContaining({
 			display: true,
 			gridLines: {
 				color: "rgba(0, 0, 0, 0.1)",
 				display: true,
 				drawOnChartArea: true,
 				drawTicks: true, // draw ticks extending towards the label
+				drawBorder: true,
 				lineWidth: 1,
 				offsetGridLines: false,
 				tickMarkLength: 10,
 				zeroLineColor: "rgba(0,0,0,0.25)",
 				zeroLineWidth: 1,
+				borderDash: [],
+				borderDashOffset: 0,
 			},
 			position: 'chartArea',
 			scaleLabel: {
@@ -30,6 +33,7 @@ describe('Smith Scale', function() {
 			ticks: {
 				beginAtZero: false,
 				maxRotation: 50,
+				minRotation: 0,
 				mirror: false,
 				padding: 5,
 				reverse: false,
@@ -38,9 +42,10 @@ describe('Smith Scale', function() {
 				rCallback: jasmine.any(Function),
 				xCallback: jasmine.any(Function),
 				autoSkip: true,
-				autoSkipPadding: 0
+				autoSkipPadding: 0,
+				labelOffset: 0
 			}
-		});
+		}));
 
 		expect(defaultConfig.ticks.callback).toEqual(jasmine.any(Function));
 	});
@@ -1020,7 +1025,7 @@ describe('Smith Scale', function() {
 			"args": [250.98358705298364, 202.04015954593774]
 		}, {
 			"name": "rotate",
-			"args": [0.03999466794630145]
+			"args": [0.03999466794630146]
 		}, {
 			"name": "fillText",
 			"args": ["-50i", 5, 0]
@@ -1065,7 +1070,7 @@ describe('Smith Scale', function() {
 			"args": [247.0994371482176, 219.624765478424]
 		}, {
 			"name": "rotate",
-			"args": [0.3947911196997615]
+			"args": [0.39479111969976155]
 		}, {
 			"name": "fillText",
 			"args": ["-5i", 5, 0]
@@ -1110,7 +1115,7 @@ describe('Smith Scale', function() {
 			"args": [230.61463414634144, 240.8195121951219]
 		}, {
 			"name": "rotate",
-			"args": [0.9272952180016117]
+			"args": [0.9272952180016119]
 		}, {
 			"name": "fillText",
 			"args": ["-2i", 5, 0]
@@ -1245,7 +1250,7 @@ describe('Smith Scale', function() {
 			"args": [188.7995240928019, 150.22010707911963]
 		}, {
 			"name": "rotate",
-			"args": [1.349481884447105]
+			"args": [1.3494818844471048]
 		}, {
 			"name": "fillText",
 			"args": ["0.8i", -5, 0]
@@ -1275,7 +1280,7 @@ describe('Smith Scale', function() {
 			"args": [230.61463414634144, 159.1804878048781]
 		}, {
 			"name": "rotate",
-			"args": [-0.9272952180016117]
+			"args": [-0.9272952180016119]
 		}, {
 			"name": "fillText",
 			"args": ["2i", 5, 0]
@@ -1320,7 +1325,7 @@ describe('Smith Scale', function() {
 			"args": [247.0994371482176, 180.375234521576]
 		}, {
 			"name": "rotate",
-			"args": [-0.3947911196997615]
+			"args": [-0.39479111969976155]
 		}, {
 			"name": "fillText",
 			"args": ["5i", 5, 0]
@@ -1365,7 +1370,7 @@ describe('Smith Scale', function() {
 			"args": [250.98358705298364, 197.95984045406226]
 		}, {
 			"name": "rotate",
-			"args": [-0.03999466794630145]
+			"args": [-0.03999466794630146]
 		}, {
 			"name": "fillText",
 			"args": ["50i", 5, 0]
