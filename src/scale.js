@@ -2,6 +2,7 @@
  * Defines the scale for the smith chart.
  * When built, Chart will be passed via the UMD header
  */
+import Chart from 'chart.js';
 var helpers = Chart.helpers;
 
 var defaults = {
@@ -112,7 +113,7 @@ var SmithScale = Chart.Scale.extend({
 		//
 		// The center point and radius will need to be scaled based on the size of the canvas
 		// Draw each of the circles
-		helpers.each(this.rTicks, function(r, rIndex) {
+		helpers.each(this.rTicks, function(r) {
 			var radius = 1 / (1 + r) * (this.minDimension / 2); // scale for the min dimension
 			var x = this.xCenter + ((r / (1 + r)) * (this.minDimension / 2));
 
@@ -137,9 +138,10 @@ var SmithScale = Chart.Scale.extend({
 				var xCoord = this.xCenter + (this.minDimension / 2); // far right side of the drawing area
 				var yCoord = x > 0 ? this.yCenter - xRadius : this.yCenter + xRadius;
 
-				// Ok, these circles are a pain. They need to only be drawn in the region that intersects the resistance == 0 circle. This circle has a 
-				// radius of 0.5 * this.minDimension and is centered at (xCenter, yCenter)
-				// We will solve the intersection in polar coordinates and define the center of our coordinate system as the center of the xCircle, ie (xCoord, yCoord)
+				// Ok, these circles are a pain. They need to only be drawn in the region that intersects the
+				// resistance == 0 circle. This circle has a radius of 0.5 * this.minDimension and is centered
+				// at (xCenter, yCenter). We will solve the intersection in polar coordinates and define the
+				// center of our coordinate system as the center of the xCircle, ie (xCoord, yCoord)
 
 				var r0 = Math.sqrt(Math.pow(xCoord - this.xCenter, 2) + Math.pow(yCoord - this.yCenter, 2));
 				var phi0 = Math.atan2(this.yCenter - yCoord, this.xCenter - xCoord);
@@ -163,8 +165,8 @@ var SmithScale = Chart.Scale.extend({
 				});
 
 				this.xLabelPoints.push({
-					x : xCoord + (Math.cos(phi2) * xRadius),
-					y : yCoord + (Math.sin(phi2) * xRadius),
+					x: xCoord + (Math.cos(phi2) * xRadius),
+					y: yCoord + (Math.sin(phi2) * xRadius),
 				});
 			} else {
 				this.xLabelPoints.push(null);
@@ -191,7 +193,6 @@ var SmithScale = Chart.Scale.extend({
 					this.ctx.arc(arc.x, arc.y, arc.r, arc.s, arc.e, arc.cc);
 					this.ctx.stroke();
 				}, this);
-				
 			} else {
 				// Simply draw a border line
 				this.ctx.strokeStyle = this.options.gridLines.color;
@@ -227,7 +228,7 @@ var SmithScale = Chart.Scale.extend({
 					var pt = this.xLabelPoints[index];
 
 					if (pt) {
-						var align = 'left'
+						var align = 'left';
 						var ang = Math.atan2(pt.y - this.yCenter, pt.x - this.xCenter);
 						var textPadding = this.options.ticks.padding;
 
@@ -277,5 +278,5 @@ var SmithScale = Chart.Scale.extend({
 	}
 });
 
-export { defaults };
+export {defaults};
 export default SmithScale;

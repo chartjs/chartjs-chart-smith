@@ -1,9 +1,5 @@
 import Chart from 'chart.js';
 
-function roundTo1Decimal(a) {
-	return Math.round(a * 10) / 10;
-}
-
 const helpers = Chart.helpers;
 const resolve = helpers.options.resolve;
 const valueOrDefault = helpers.valueOrDefault;
@@ -12,19 +8,17 @@ const Controller = Chart.controllers.line.extend({
 	// Not needed since there is only a single scale
 	linkScales: helpers.noop,
 
-	updateElement: function(point, index, reset) {
+	updateElement: function(point, index) {
 		var me = this;
 		var meta = me.getMeta();
 		var custom = point.custom || {};
-		var dataset = me.getDataset();
 		var datasetIndex = me.index;
-		var value = dataset.data[index];
 		var yScale = me.getScaleForId(meta.yAxisID);
 		var xScale = me.getScaleForId(meta.xAxisID);
 		var lineModel = meta.dataset._model;
 
 		var options = me._resolvePointOptions(point, index);
-		var { x, y } = me.calculatePointPosition(index);
+		var {x, y} = me.calculatePointPosition(index);
 
 		// Utility
 		point._xScale = xScale;
