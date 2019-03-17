@@ -1,17 +1,24 @@
 {
-  "name": "Chart.Smith.js",
+  "name": "chartjs-chart-smith",
   "author": {
     "name": "Evert Timberg"
   },
   "description": "Smith chart implementation for Chart.js",
-  "main": "Chart.Smith.js",
   "version": "0.2.0",
+  "license": "MIT",
+  "jsdelivr": "Chart.Smith.js",
+  "unpkg": "Chart.Smith.js",
+  "main": "Chart.Smith.js",
+  "keywords": [
+    "chartjs",
+    "smith chart"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/etimberg/Chart.Smith.js.git"
+    "url": "https://github.com/chartjs/chartjs-chart-smith"
   },
   "dependencies": {
-    "chart.js": "^2.4.0"
+    "chart.js": "^2.8.0"
   },
   "devDependencies": {
     "check-dependencies": "^0.11.0",
