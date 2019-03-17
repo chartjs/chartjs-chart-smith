@@ -1,85 +1,135 @@
-var concat = require('gulp-concat'),
-	gulp = require('gulp'),
-	insert = require('gulp-insert'),
-	jshint = require('gulp-jshint'),
-	karma = require('karma'),
-	package = require('./package.json'),
-	replace = require('gulp-replace'),
-	umd = require('gulp-umd'),
-	util = require('gulp-util');
+/* global Promise */
 
-var srcDir = './src/';
-var srcFiles = srcDir + '**.js';
-var testFiles = './test/**.js';
-var buildDir = '.';
-var testSrc = ['./node_modules/Chart.js/dist/Chart.js', srcFiles, testFiles];
+var gulp = require('gulp');
+var eslint = require('gulp-eslint');
+var file = require('gulp-file');
+var replace = require('gulp-replace');
+var streamify = require('gulp-streamify');
+var zip = require('gulp-zip');
+var karma = require('karma');
+var merge = require('merge2');
+var path = require('path');
+var {exec} = require('child_process');
+var pkg = require('./package.json');
 
-var header = "/*!\n\
- * Chart.Smith.js\n\
- * Version: {{ version }}\n\
- *\n\
- * Copyright 2016 Evert Timberg\n\
- * Released under the MIT license\n\
- * https://github.com/chartjs/Chart.Smith.js/blob/master/LICENSE.md\n\
- */\n";
+var argv = require('yargs')
+	.option('output', {alias: 'o', default: 'dist'})
+	.option('samples-dir', {default: 'samples'})
+	.option('docs-dir', {default: 'docs'})
+	.option('www-dir', {default: 'www'})
+	.argv;
 
-gulp.task('build', buildTask);
-gulp.task('ci', ['jshint', 'test']); // runs on CI
-gulp.task('coverage', coverageTask);
-gulp.task('coverageWatch', coverageWatchTask);
-gulp.task('jshint', jsHintTask);
-gulp.task('test', testTask);
-gulp.task('testWatch', testWatchTask);
+function run(bin, args) {
+	return new Promise((resolve, reject) => {
+		var exe = '"' + process.execPath + '"';
+		var src = require.resolve(bin);
+		var ps = exec([exe, src].concat(args || []).join(' '));
 
-function buildTask() {
-	return gulp.src(srcFiles)
-		.pipe(concat('Chart.Smith.js'))
-		.pipe(umd({
-			templateName: 'amdCommonWeb',
-			dependencies: function() {
-				return ['Chart']
+		ps.stdout.pipe(process.stdout);
+		ps.stderr.pipe(process.stderr);
+		ps.on('close', (error) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve();
 			}
-		}))
-		.pipe(insert.prepend(header))
-		.pipe(replace('{{ version }}', package.version))
-		.pipe(gulp.dest(buildDir));
+		});
+	});
 }
 
-function runCoverage(done, singleRun) {
+gulp.task('build', function() {
+	return run('rollup/bin/rollup', ['-c', argv.watch ? '--watch' : '']);
+});
+
+gulp.task('test-unit', function(done) {
 	new karma.Server({
-		configFile: __dirname + '/karma.coverage.conf.js',
-		singleRun: singleRun
-	}, done).start();
-}
+		configFile: path.join(__dirname, 'karma.config.js'),
+		singleRun: !argv.watch,
+		args: {
+			coverage: !!argv.coverage,
+			inputs: (argv.inputs || 'test/specs/**/*.js').split(';'),
+			watch: argv.watch
+		}
+	},
+	function(error) {
+		// https://github.com/karma-runner/gulp-karma/issues/18
+		error = error ? new Error('Karma returned with the error code: ' + error) : undefined;
+		done(error);
+	}).start();
+});
 
-// Task that runs coverage analysis
-function coverageTask(done) {
-	runCoverage(done, true);
-}
+gulp.task('test-types', function() {
+	return run('typescript/bin/tsc', ['-p', 'types/test/']);
+});
 
-function coverageWatchTask(done) {
-	runCoverage(done, false);
-}
+gulp.task('test', gulp.parallel('test-unit', 'test-types'));
 
-// Run JSHint
-function jsHintTask() {
-	return gulp.src(srcFiles)
-		.pipe(jshint())
-		.pipe(jshint.reporter('default'));
-}
+gulp.task('lint', function() {
+	var files = [
+		'samples/**/*.js',
+		'src/**/*.js',
+		'test/**/*.js',
+		'*.js'
+	];
 
-function runTest(done, singleRun) {
-	new karma.Server({
-		configFile: __dirname + '/karma.conf.js',
-		singleRun: singleRun
-	}, done).start();
-}
+	return gulp.src(files)
+		.pipe(eslint())
+		.pipe(eslint.format())
+		.pipe(eslint.failAfterError());
+});
 
-// Run unit tests
-function testTask(done) {
-	runTest(done, true);
-}
+gulp.task('docs', function() {
+	var mode = argv.watch ? 'dev' : 'build';
+	var out = path.join(argv.output, argv.docsDir);
+	var args = argv.watch ? '' : '--dest ' + out;
+	return run('vuepress/bin/vuepress.js', [mode, 'docs', args]);
+});
 
-function testWatchTask(done) {
-	runTest(done, false);
-}
+gulp.task('samples', function() {
+	// since we moved the dist files one folder up (package root), we need to rewrite
+	// samples src="../dist/ to src="../ and then copy them in the /samples directory.
+	var out = path.join(argv.output, argv.samplesDir);
+	return gulp.src('samples/**/*', {base: 'samples'})
+		.pipe(streamify(replace(/src="((?:\.\.\/)+)dist\//g, 'src="$1', {skipBinary: true})))
+		.pipe(gulp.dest(out));
+});
+
+gulp.task('package', gulp.series(gulp.parallel('build', 'samples'), function() {
+	var out = argv.output;
+	var streams = merge(
+		gulp.src(path.join(out, argv.samplesDir, '**/*'), {base: out}),
+		gulp.src([path.join(out, '*.js'), 'LICENSE.md'])
+	);
+
+	return streams
+		.pipe(zip(pkg.name + '.zip'))
+		.pipe(gulp.dest(out));
+}));
+
+gulp.task('netlify', gulp.series(gulp.parallel('build', 'docs', 'samples'), function() {
+	var root = argv.output;
+	var out = path.join(root, argv.wwwDir);
+	var streams = merge(
+		gulp.src(path.join(root, argv.docsDir, '**/*'), {base: path.join(root, argv.docsDir)}),
+		gulp.src(path.join(root, argv.samplesDir, '**/*'), {base: root}),
+		gulp.src(path.join(root, '*.js'))
+	);
+
+	return streams.pipe(gulp.dest(out));
+}));
+
+gulp.task('bower', function() {
+	var json = JSON.stringify({
+		name: pkg.name,
+		description: pkg.description,
+		homepage: pkg.homepage,
+		license: pkg.license,
+		version: pkg.version,
+		main: argv.output + '/' + pkg.name + '.js'
+	}, null, 2);
+
+	return file('bower.json', json, {src: true})
+		.pipe(gulp.dest('./'));
+});
+
+gulp.task('default', gulp.parallel('build'));
