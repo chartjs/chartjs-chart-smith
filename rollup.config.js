@@ -10,7 +10,7 @@ const banner = `/*!
 
 module.exports = [
 	{
-		input: 'src/chart.js',
+		input: 'src/index.js',
 		output: {
 			name: 'ChartTypeSmith',
 			file: `dist/${pkg.name}.js`,
@@ -26,7 +26,7 @@ module.exports = [
 		]
 	},
 	{
-		input: 'src/chart.js',
+		input: 'src/index.js',
 		output: {
 			name: 'ChartTypeSmith',
 			file: `dist/${pkg.name}.min.js`,
