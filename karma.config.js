@@ -5,7 +5,7 @@ const builds = require('./rollup.config');
 
 module.exports = function(karma) {
 	const args = karma.args || {};
-	const regex = args.watch ? /s\.js$/ : /s\.min\.js$/;
+	const regex = args.watch ? /h\.js$/ : /h\.min\.js$/;
 	const build = builds.filter((v) => v.output.file.match(regex))[0];
 
 	if (args.watch) {
@@ -23,7 +23,7 @@ module.exports = function(karma) {
 			{pattern: './test/fixtures/**/*.png', included: false},
 			'node_modules/chart.js/dist/Chart.js',
 			'test/index.js',
-			'src/plugin.js'
+			'src/index.js'
 		].concat(args.inputs),
 
 		// Explicitly disable hardware acceleration to make image
@@ -42,7 +42,7 @@ module.exports = function(karma) {
 			'test/fixtures/**/*.js': ['fixtures'],
 			'test/specs/**/*.js': ['rollup'],
 			'test/index.js': ['rollup'],
-			'src/plugin.js': ['sources']
+			'src/index.js': ['sources']
 		},
 
 		rollupPreprocessor: {
