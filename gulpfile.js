@@ -41,7 +41,7 @@ gulp.task('build', function() {
 	return run('rollup/bin/rollup', ['-c', argv.watch ? '--watch' : '']);
 });
 
-gulp.task('test-unit', function(done) {
+gulp.task('test', function(done) {
 	new karma.Server({
 		configFile: path.join(__dirname, 'karma.config.js'),
 		singleRun: !argv.watch,
@@ -57,12 +57,6 @@ gulp.task('test-unit', function(done) {
 		done(error);
 	}).start();
 });
-
-gulp.task('test-types', function() {
-	return run('typescript/bin/tsc', ['-p', 'types/test/']);
-});
-
-gulp.task('test', gulp.parallel('test-unit', 'test-types'));
 
 gulp.task('lint', function() {
 	var files = [
