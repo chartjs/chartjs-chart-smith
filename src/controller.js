@@ -1,10 +1,10 @@
 import Chart from 'chart.js';
 
-const helpers = Chart.helpers;
-const resolve = helpers.options.resolve;
-const valueOrDefault = helpers.valueOrDefault;
+var helpers = Chart.helpers;
+var resolve = helpers.options.resolve;
+var valueOrDefault = helpers.valueOrDefault;
 
-const Controller = Chart.controllers.line.extend({
+var Controller = Chart.controllers.line.extend({
 	// Not needed since there is only a single scale
 	linkScales: helpers.noop,
 
