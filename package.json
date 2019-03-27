@@ -53,6 +53,6 @@
     "yargs": "^13.2.2"
   },
   "peerDependencies": {
-    "chart.js": ">= 2.8.0 < 3"
+    "chart.js": ">= 2.7.0 < 3"
   }
 }
