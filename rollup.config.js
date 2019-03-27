@@ -12,7 +12,6 @@ module.exports = [
 	{
 		input: 'src/index.js',
 		output: {
-			name: 'ChartTypeSmith',
 			file: `dist/${pkg.name}.js`,
 			banner: banner,
 			format: 'umd',
@@ -28,7 +27,6 @@ module.exports = [
 	{
 		input: 'src/index.js',
 		output: {
-			name: 'ChartTypeSmith',
 			file: `dist/${pkg.name}.min.js`,
 			format: 'umd',
 			indent: false,
