@@ -22,9 +22,6 @@
     "bower.json",
     "dist/*.js"
   ],
-  "dependencies": {
-    "chart.js": "^2.8.0"
-  },
   "devDependencies": {
     "chart.js": "~2.8.0",
     "eslint-config-chartjs": "^0.1.0",
