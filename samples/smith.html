@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<title>Smith Chart</title>
-		<script src="../node_modules/chart.js/dist/Chart.js"></script>
-		<script src="../Chart.smith.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.js"></script>
+		<script src="../dist/chartjs-chart-smith.js"></script>
 		<style>
 			body{
 				padding: 0;
@@ -38,10 +38,11 @@
 				data: {
 					datasets: [{
 						label: 'My Dataset',
-						data: [ { real : 1.0, imag : 2.0}, 
+						data: [
+							{ real : 1.0, imag : 2.0}, 
 							{ real : 1.0, imag : 1.0},
 							{ real : 1.0, imag : -1.0}
-						]
+						],
 					}]
 				}
 			})

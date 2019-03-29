@@ -1,34 +1,55 @@
 {
-  "name": "Chart.Smith.js",
+  "name": "chartjs-chart-smith",
   "author": {
     "name": "Evert Timberg"
   },
-  "description": "Smith chart implementation for Chart.js",
-  "main": "Chart.Smith.js",
+  "description": "Create Smith Chart with Chart.js",
   "version": "0.2.0",
+  "license": "MIT",
+  "homepage": "https://github.com/chartjs/chartjs-chart-smith",
+  "jsdelivr": "dist/chartjs-chart-smith.min.js",
+  "unpkg": "dist/chartjs-chart-smith.min.js",
+  "main": "dist/chartjs-chart-smith.min.js",
+  "keywords": [
+    "chartjs",
+    "smith chart"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/etimberg/Chart.Smith.js.git"
+    "url": "https://github.com/chartjs/chartjs-chart-smith.git"
   },
-  "dependencies": {
-    "chart.js": "^2.4.0"
-  },
+  "files": [
+    "bower.json",
+    "dist/*.js"
+  ],
   "devDependencies": {
-    "check-dependencies": "^0.11.0",
-    "gulp": ">=3.9.0",
-    "gulp-concat": ">=2.6.0",
-    "gulp-insert": "^0.5.0",
-    "gulp-jshint": "^2.0.0",
-    "gulp-replace": ">=0.5.4",
-    "gulp-umd": ">=0.2.0",
-    "gulp-util": ">=3.0.7",
-    "jasmine": "^2.4.1",
-    "jshint": "^2.9.1-rc2",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^0.2.3",
-    "karma-coverage": "^0.5.5",
-    "karma-firefox-launcher": "^0.1.7",
-    "karma-jasmine": "^0.3.8",
-    "karma-jasmine-html-reporter": "^0.2.0"
+    "chart.js": "~2.8.0",
+    "eslint-config-chartjs": "^0.1.0",
+    "gulp": "^4.0.0",
+    "gulp-eslint": "^5.0.0",
+    "gulp-file": "^0.4.0",
+    "gulp-replace": "^1.0.0",
+    "gulp-streamify": "^1.0.2",
+    "gulp-zip": "^4.2.0",
+    "jasmine-core": "^3.3.0",
+    "karma": "^4.0.1",
+    "karma-coverage": "^1.1.2",
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.0",
+    "karma-rollup-preprocessor": "^7.0.0",
+    "karma-spec-reporter": "^0.0.32",
+    "merge2": "^1.2.3",
+    "pixelmatch": "^4.0.2",
+    "rollup": "^1.6.0",
+    "rollup-plugin-commonjs": "^9.2.1",
+    "rollup-plugin-istanbul": "^2.0.1",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-terser": "^4.0.4",
+    "vuepress": "^0.14.10",
+    "yargs": "^13.2.2"
+  },
+  "peerDependencies": {
+    "chart.js": ">= 2.7.0 < 3"
   }
 }
