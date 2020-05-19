@@ -31,5 +31,6 @@ jobs:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
           DISPLAY: :99
         run: |
+          sh -e /etc/init.d/xvfb start
           gulp test --coverage
           coveralls
