@@ -1,5 +1,7 @@
-# Chart.Smith.js
-[![Build Status](https://travis-ci.org/chartjs/Chart.smith.js.svg?branch=master)](https://travis-ci.org/chartjs/Chart.smith.js)
+# chartjs-chart-smith
+
+[![MIT license](https://img.shields.io/github/license/chartjs/chartjs-chart-smith)](https://github.com/chartjs/chartjs-chart-smith/blob/master/LICENSE.md)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/chartjs/chartjs-chart-smith/CI)
 
 Provides a Smith Chart for use with [Chart.js](http://www.chartjs.org)
 
