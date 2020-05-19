@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - run: npm install
+      - run: gulp lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - name: Setup xvfb
+        run: |
+          Xvfb :99 -screen 0 1024x768x24 &
+          echo "::set-env name=DISPLAY:::99.0"
+      - run: npm install
+      - name: RUN CI
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: gulp test --coverage
+      - name: Publish Test Results
+        run: cat ./coverage/lcov.info | ./node_modules/.bin/coveralls
+        shell: bash
+        continue-on-error: true
