@@ -29,6 +29,7 @@ jobs:
       - name: RUN CI
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          DISPLAY: :99
         run: |
           gulp test --coverage
           coveralls
