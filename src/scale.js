@@ -3,24 +3,20 @@
  * When built, Chart will be passed via the UMD header
  */
 import Chart from 'chart.js';
-var helpers = Chart.helpers;
+const helpers = Chart.helpers;
 
-var defaults = {
+const defaults = {
 	position: 'chartArea',
 	display: true,
 	ticks: {
 		padding: 5,
-		rCallback: function(tick) {
-			return tick.toString();
-		},
-		xCallback: function(tick) {
-			return tick.toString() + 'i';
-		}
+		rCallback: (tick) => tick.toString(),
+		xCallback: (tick) => tick.toString() + 'i',
 	}
 };
 
-var SmithScale = Chart.Scale.extend({
-	setDimensions: function() {
+class SmithScale extends Chart.Scale {
+	setDimensions() {
 		this.height = this.maxHeight;
 		this.width = this.maxWidth;
 		this.xCenter = this.left + Math.round(this.width / 2);
@@ -30,17 +26,17 @@ var SmithScale = Chart.Scale.extend({
 		this.paddingTop = 0;
 		this.paddingRight = 0;
 		this.paddingBottom = 0;
-	},
+	}
 
-	buildTicks: function() {
+	buildTicks() {
 		this.rTicks = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0, 50.0];
 		this.xTicks = [-50.0, -20.0, -10.0, -5.0, -4.0, -3.0, -2.0, -1.0, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0, 20.0, 50.0];
 
 		// Need to do this to make the core scale work
 		return [];
-	},
+	}
 
-	convertTicksToLabels: function() {
+	convertTicksToLabels() {
 		this.rLabels = this.rTicks.map(function(tick, index, ticks) {
 			return this.options.ticks.rCallback.apply(this, [tick, index, ticks]);
 		}, this);
@@ -51,38 +47,39 @@ var SmithScale = Chart.Scale.extend({
 
 		// Need to do this to make the core scale work
 		return [];
-	},
+	}
 
-	calculateTickRotation: helpers.noop,
+	// There is no tick rotation to calculate, so this needs to be overridden
+	// eslint-disable-next-line class-methods-use-this, no-empty-function
+	calculateTickRotation() {}
 
 	// fit function similar to the radial linear scale
-	fit: function() {
-		this.xCenter = (this.left + this.right) / 2;
-		this.yCenter = (this.top + this.bottom) / 2;
-		var fontSize = helpers.getValueOrDefault(this.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
+	fit() {
+		const me = this;
+		me.xCenter = (me.left + me.right) / 2;
+		me.yCenter = (me.top + me.bottom) / 2;
+		const fontSize = helpers.getValueOrDefault(me.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
 
-		if (this.options.ticks.display) {
-			var fontStyle = helpers.getValueOrDefault(this.options.ticks.fontStyle, Chart.defaults.global.defaultFontStyle);
-			var fontFamily = helpers.getValueOrDefault(this.options.ticks.fontFamily, Chart.defaults.global.defaultFontFamily);
-			var labelFont = helpers.fontString(fontSize, fontStyle, fontFamily);
-			this.ctx.font = labelFont;
+		if (me.options.ticks.display) {
+			const fontStyle = helpers.getValueOrDefault(me.options.ticks.fontStyle, Chart.defaults.global.defaultFontStyle);
+			const fontFamily = helpers.getValueOrDefault(me.options.ticks.fontFamily, Chart.defaults.global.defaultFontFamily);
+			const labelFont = helpers.fontString(fontSize, fontStyle, fontFamily);
+			me.ctx.font = labelFont;
 
-			var xLabelLengths = this.xLabels.map(function(tick) {
-				return this.ctx.measureText(tick).width;
-			}, this);
+			const xLabelLengths = me.xLabels.map((tick) => me.ctx.measureText(tick).width);
 
 			// Figure out where these points will go, and assuming they are drawn there, how much will it go outside of the chart area.
 			// We use that to determine how much padding we nede on each side
-			this.minDimension = Math.min(this.right - this.left, this.bottom - this.top);
+			me.minDimension = Math.min(me.right - me.left, me.bottom - me.top);
 
-			helpers.each(this.xTicks, function(xTick, index) {
+			helpers.each(me.xTicks, (xTick, index) => {
 				if (xTick !== 0) {
-					var halfDimension = this.minDimension / 2;
-					var labelStart = this.getPointPosition(0, xTick);
-					var cosPhi = (labelStart.x - this.xCenter) / halfDimension;
-					var sinPhi = (labelStart.y - this.yCenter) / halfDimension;
-					var labelWidth = xLabelLengths[index] + this.options.ticks.padding;
-					var pts = [{
+					const halfDimension = me.minDimension / 2;
+					const labelStart = me.getPointPosition(0, xTick);
+					const cosPhi = (labelStart.x - me.xCenter) / halfDimension;
+					const sinPhi = (labelStart.y - me.yCenter) / halfDimension;
+					const labelWidth = xLabelLengths[index] + me.options.ticks.padding;
+					const pts = [{
 						x: labelStart.x + (cosPhi * labelWidth) + (sinPhi * fontSize),
 						y: labelStart.y + (sinPhi * labelWidth) - (cosPhi * fontSize)
 					}, {
@@ -90,22 +87,22 @@ var SmithScale = Chart.Scale.extend({
 						y: labelStart.y + (sinPhi * labelWidth) + (cosPhi * fontSize)
 					}];
 
-					helpers.each(pts, function(pt) {
-						this.paddingLeft = Math.max(this.paddingLeft, this.left - pt.x);
-						this.paddingTop = Math.max(this.paddingTop, this.top - pt.y);
-						this.paddingRight = Math.max(this.paddingRight, pt.x - this.right);
-						this.paddingBottom = Math.max(this.paddingBottom, pt.y - this.bottom);
-					}, this);
+					helpers.each(pts, pt => {
+						me.paddingLeft = Math.max(me.paddingLeft, me.left - pt.x);
+						me.paddingTop = Math.max(me.paddingTop, me.top - pt.y);
+						me.paddingRight = Math.max(me.paddingRight, pt.x - me.right);
+						me.paddingBottom = Math.max(me.paddingBottom, pt.y - me.bottom);
+					});
 				}
-			}, this);
+			});
 		}
 
-		this.minDimension = Math.min(this.right - this.left - this.paddingLeft - this.paddingRight, this.bottom - this.top - this.paddingBottom - this.paddingTop);
+		me.minDimension = Math.min(me.right - me.left - me.paddingLeft - me.paddingRight, me.bottom - me.top - me.paddingBottom - me.paddingTop);
 
 		// Store data about the arcs that we will draw
-		this.arcs = [];
-		this.rLabelPoints = [];
-		this.xLabelPoints = [];
+		me.arcs = [];
+		me.rLabelPoints = [];
+		me.xLabelPoints = [];
 
 		// How do we draw the circles? From http://care.iitd.ac.in/People/Faculty/bspanwar/crl713/smith_chart_basics.pdf
 		// we have that constant resistance circles obey the following
@@ -113,157 +110,159 @@ var SmithScale = Chart.Scale.extend({
 		//
 		// The center point and radius will need to be scaled based on the size of the canvas
 		// Draw each of the circles
-		helpers.each(this.rTicks, function(r) {
-			var radius = 1 / (1 + r) * (this.minDimension / 2); // scale for the min dimension
-			var x = this.xCenter + ((r / (1 + r)) * (this.minDimension / 2));
+		helpers.each(me.rTicks, r => {
+			const radius = 1 / (1 + r) * (me.minDimension / 2); // scale for the min dimension
+			const x = me.xCenter + ((r / (1 + r)) * (me.minDimension / 2));
 
-			this.arcs.push({
-				x: x,
-				y: this.yCenter,
+			me.arcs.push({
+				x,
+				y: me.yCenter,
 				r: radius,
 				s: 0,
 				e: 2 * Math.PI,
 				cc: false
 			});
 
-			this.rLabelPoints.push({
+			me.rLabelPoints.push({
 				x: x - radius,
-				y: this.yCenter
+				y: me.yCenter
 			});
-		}, this);
+		});
 
-		helpers.each(this.xTicks, function(x) {
+		helpers.each(me.xTicks, x => {
 			if (x !== 0) {
-				var xRadius = (1 / Math.abs(x)) * (this.minDimension / 2);
-				var xCoord = this.xCenter + (this.minDimension / 2); // far right side of the drawing area
-				var yCoord = x > 0 ? this.yCenter - xRadius : this.yCenter + xRadius;
+				const xRadius = (1 / Math.abs(x)) * (me.minDimension / 2);
+				const xCoord = me.xCenter + (me.minDimension / 2); // far right side of the drawing area
+				const yCoord = x > 0 ? me.yCenter - xRadius : me.yCenter + xRadius;
 
 				// Ok, these circles are a pain. They need to only be drawn in the region that intersects the
 				// resistance == 0 circle. This circle has a radius of 0.5 * this.minDimension and is centered
 				// at (xCenter, yCenter). We will solve the intersection in polar coordinates and define the
 				// center of our coordinate system as the center of the xCircle, ie (xCoord, yCoord)
 
-				var r0 = Math.sqrt(Math.pow(xCoord - this.xCenter, 2) + Math.pow(yCoord - this.yCenter, 2));
-				var phi0 = Math.atan2(this.yCenter - yCoord, this.xCenter - xCoord);
+				const r0 = Math.sqrt(Math.pow(xCoord - me.xCenter, 2) + Math.pow(yCoord - me.yCenter, 2));
+				const phi0 = Math.atan2(me.yCenter - yCoord, me.xCenter - xCoord);
 
 				// A circle with center location r0,phi0 with radius a is defined in polar coordinates by the equation
 				// r = r0 * cos(phi - phi0) + sqrt(a^2 - ((r0^2) * sin^2(phi - phi0)))
 				// Our xCircle is defined by r = xRadius because of where we defined the 0,0 point
 				// Solving the intersection of these equations yields
 				// phi = 0.5 * arccos((xRadius^2 - a^2) / (r0^2)) + phi0
-				var arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(this.minDimension / 2, 2)) / Math.pow(r0, 2));
-				var phi2 = ((x > 0 ? 0.5 : -0.5) * arccos) + phi0;
-				var startAngle = x > 0 ? 0.5 * Math.PI : -0.5 * Math.PI;
+				const arccos = Math.acos((Math.pow(xRadius, 2) - Math.pow(me.minDimension / 2, 2)) / Math.pow(r0, 2));
+				const phi2 = ((x > 0 ? 0.5 : -0.5) * arccos) + phi0;
+				const startAngle = x > 0 ? 0.5 * Math.PI : -0.5 * Math.PI;
 
-				this.arcs.push({
+				me.arcs.push({
 					x: xCoord,
 					y: yCoord,
 					r: xRadius,
 					s: startAngle,
 					e: phi2,
-					cc: x > 0 ? false : true
+					cc: x <= 0
 				});
 
-				this.xLabelPoints.push({
+				me.xLabelPoints.push({
 					x: xCoord + (Math.cos(phi2) * xRadius),
 					y: yCoord + (Math.sin(phi2) * xRadius),
 				});
 			} else {
-				this.xLabelPoints.push(null);
+				me.xLabelPoints.push(null);
 			}
-		}, this);
-	},
+		});
+	}
 
 	// Need a custom draw function here
-	draw: function() {
-		if (this.options.display) {
-			if (this.options.gridLines.display) {
-				this.ctx.strokeStyle = this.options.gridLines.color;
-				this.ctx.lineWidth = this.options.gridLines.lineWidth;
+	draw() {
+		const me = this;
+
+		if (me.options.display) {
+			if (me.options.gridLines.display) {
+				me.ctx.strokeStyle = me.options.gridLines.color;
+				me.ctx.lineWidth = me.options.gridLines.lineWidth;
 
 				// Draw horizontal line for x === 0
-				this.ctx.beginPath();
-				this.ctx.moveTo(this.xCenter - (this.minDimension / 2), this.yCenter);
-				this.ctx.lineTo(this.xCenter + (this.minDimension / 2), this.yCenter);
-				this.ctx.stroke();
+				me.ctx.beginPath();
+				me.ctx.moveTo(me.xCenter - (me.minDimension / 2), me.yCenter);
+				me.ctx.lineTo(me.xCenter + (me.minDimension / 2), me.yCenter);
+				me.ctx.stroke();
 
 				// Draw each of the arcs
-				helpers.each(this.arcs, function(arc) {
-					this.ctx.beginPath();
-					this.ctx.arc(arc.x, arc.y, arc.r, arc.s, arc.e, arc.cc);
-					this.ctx.stroke();
-				}, this);
+				helpers.each(me.arcs, arc => {
+					me.ctx.beginPath();
+					me.ctx.arc(arc.x, arc.y, arc.r, arc.s, arc.e, arc.cc);
+					me.ctx.stroke();
+				});
 			} else {
 				// Simply draw a border line
-				this.ctx.strokeStyle = this.options.gridLines.color;
-				this.ctx.lineWidth = this.options.gridLines.lineWidth;
-				this.ctx.beginPath();
-				this.ctx.arc(this.xCenter, this.yCenter, this.minDimension / 2, 0, 2 * Math.PI, false);
-				this.ctx.stroke();
+				me.ctx.strokeStyle = me.options.gridLines.color;
+				me.ctx.lineWidth = me.options.gridLines.lineWidth;
+				me.ctx.beginPath();
+				me.ctx.arc(me.xCenter, me.yCenter, me.minDimension / 2, 0, 2 * Math.PI, false);
+				me.ctx.stroke();
 			}
 
-			if (this.options.ticks.display) {
-				var fontSize = helpers.getValueOrDefault(this.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
-				var fontStyle = helpers.getValueOrDefault(this.options.ticks.fontStyle, Chart.defaults.global.defaultFontStyle);
-				var fontFamily = helpers.getValueOrDefault(this.options.ticks.fontFamily, Chart.defaults.global.defaultFontFamily);
+			if (me.options.ticks.display) {
+				const fontSize = helpers.getValueOrDefault(me.options.ticks.fontSize, Chart.defaults.global.defaultFontSize);
+				const fontStyle = helpers.getValueOrDefault(me.options.ticks.fontStyle, Chart.defaults.global.defaultFontStyle);
+				const fontFamily = helpers.getValueOrDefault(me.options.ticks.fontFamily, Chart.defaults.global.defaultFontFamily);
 
-				var labelFont = helpers.fontString(fontSize, fontStyle, fontFamily);
-				this.ctx.font = labelFont;
+				const labelFont = helpers.fontString(fontSize, fontStyle, fontFamily);
+				me.ctx.font = labelFont;
 
-				this.ctx.fillStyle = helpers.getValueOrDefault(this.options.ticks.fontColor, Chart.defaults.global.defaultFontColor);
+				me.ctx.fillStyle = helpers.getValueOrDefault(me.options.ticks.fontColor, Chart.defaults.global.defaultFontColor);
 
-				helpers.each(this.rLabels, function(rLabel, index) {
-					var pt = this.rLabelPoints[index];
+				helpers.each(me.rLabels, (rLabel, index) => {
+					const pt = me.rLabelPoints[index];
 
-					this.ctx.save();
-					this.ctx.translate(pt.x, pt.y);
-					this.ctx.rotate(-0.5 * Math.PI);
-					this.ctx.textBaseline = 'middle';
-					this.ctx.textAlign = 'center';
-					this.ctx.fillText(rLabel, 0, 0);
-					this.ctx.restore();
-				}, this);
+					me.ctx.save();
+					me.ctx.translate(pt.x, pt.y);
+					me.ctx.rotate(-0.5 * Math.PI);
+					me.ctx.textBaseline = 'middle';
+					me.ctx.textAlign = 'center';
+					me.ctx.fillText(rLabel, 0, 0);
+					me.ctx.restore();
+				});
 
-				helpers.each(this.xLabels, function(xLabel, index) {
-					var pt = this.xLabelPoints[index];
+				helpers.each(me.xLabels, (xLabel, index) => {
+					const pt = me.xLabelPoints[index];
 
 					if (pt) {
-						var align = 'left';
-						var ang = Math.atan2(pt.y - this.yCenter, pt.x - this.xCenter);
-						var textPadding = this.options.ticks.padding;
+						let align = 'left';
+						let ang = Math.atan2(pt.y - me.yCenter, pt.x - me.xCenter);
+						let textPadding = me.options.ticks.padding;
 
-						if (pt.x < this.xCenter) {
+						if (pt.x < me.xCenter) {
 							ang += Math.PI;
 							align = 'right';
 							textPadding *= -1;
 						}
 
-						this.ctx.save();
-						this.ctx.translate(pt.x, pt.y);
-						this.ctx.rotate(ang);
-						this.ctx.textBaseline = 'middle';
-						this.ctx.textAlign = align;
-						this.ctx.fillText(xLabel, textPadding, 0);
-						this.ctx.restore();
+						me.ctx.save();
+						me.ctx.translate(pt.x, pt.y);
+						me.ctx.rotate(ang);
+						me.ctx.textBaseline = 'middle';
+						me.ctx.textAlign = align;
+						me.ctx.fillText(xLabel, textPadding, 0);
+						me.ctx.restore();
 					}
-				}, this);
+				});
 			}
 		}
-	},
-	getPointPosition: function(real, imag) {
+	}
+	getPointPosition(real, imag) {
 		// look for the intersection of the r circle and the x circle that is not the one along the right side of the canvas
-		var realRadius = 1 / (1 + real) * (this.minDimension / 2); // scale for the minDimension size
-		var realCenterX = this.xCenter + ((real / (1 + real)) * (this.minDimension / 2));
-		var realCenterY = this.yCenter;
+		const realRadius = 1 / (1 + real) * (this.minDimension / 2); // scale for the minDimension size
+		const realCenterX = this.xCenter + ((real / (1 + real)) * (this.minDimension / 2));
+		const realCenterY = this.yCenter;
 
-		var imagRadius = (1 / Math.abs(imag)) * (this.minDimension / 2);
-		var imagCenterX = this.xCenter + (this.minDimension / 2); // far right side of the drawing area
-		var imagCenterY = imag > 0 ? this.yCenter - imagRadius : this.yCenter + imagRadius;
+		const imagRadius = (1 / Math.abs(imag)) * (this.minDimension / 2);
+		const imagCenterX = this.xCenter + (this.minDimension / 2); // far right side of the drawing area
+		const imagCenterY = imag > 0 ? this.yCenter - imagRadius : this.yCenter + imagRadius;
 
-		var r0 = Math.sqrt(Math.pow(imagCenterX - realCenterX, 2) + Math.pow(imagCenterY - realCenterY, 2));
-		var angle = Math.atan2(realCenterY - imagCenterY, realCenterX - imagCenterX);
-		var arccos = Math.acos((Math.pow(imagRadius, 2) - Math.pow(realRadius, 2)) / Math.pow(r0, 2));
-		var phi = imag > 0 ? 0.5 * arccos + angle : -0.5 * arccos + angle;
+		const r0 = Math.sqrt(Math.pow(imagCenterX - realCenterX, 2) + Math.pow(imagCenterY - realCenterY, 2));
+		const angle = Math.atan2(realCenterY - imagCenterY, realCenterX - imagCenterX);
+		const arccos = Math.acos((Math.pow(imagRadius, 2) - Math.pow(realRadius, 2)) / Math.pow(r0, 2));
+		const phi = imag > 0 ? 0.5 * arccos + angle : -0.5 * arccos + angle;
 
 		// We have an r and a phi from the point (imagCenterX, imagCenterY)
 		// translate to an x and a undefined
@@ -271,12 +270,12 @@ var SmithScale = Chart.Scale.extend({
 			x: imag === 0 ? realCenterX - realRadius : (Math.cos(phi) * imagRadius) + imagCenterX,
 			y: imag === 0 ? this.yCenter : (Math.sin(phi) * imagRadius) + imagCenterY
 		};
-	},
-	getLabelForIndex: function(index, datasetIndex) {
-		var d = this.chart.data.datasets[datasetIndex].data[index];
+	}
+	getLabelForIndex(index, datasetIndex) {
+		const d = this.chart.data.datasets[datasetIndex].data[index];
 		return d.real + ' + ' + d.imag + 'i';
 	}
-});
+}
 
 export {defaults};
 export default SmithScale;

@@ -1,24 +1,25 @@
 import Chart from 'chart.js';
 
-var helpers = Chart.helpers;
-var resolve = helpers.options.resolve;
-var valueOrDefault = helpers.valueOrDefault;
+const helpers = Chart.helpers;
+const resolve = helpers.options.resolve;
+const valueOrDefault = helpers.valueOrDefault;
 
-var Controller = Chart.controllers.line.extend({
+class Controller extends Chart.controllers.line {
 	// Not needed since there is only a single scale
-	linkScales: helpers.noop,
+	// eslint-disable-next-line class-methods-use-this, no-empty-function
+	linkScales() {}
 
-	updateElement: function(point, index) {
-		var me = this;
-		var meta = me.getMeta();
-		var custom = point.custom || {};
-		var datasetIndex = me.index;
-		var yScale = me.getScaleForId(meta.yAxisID);
-		var xScale = me.getScaleForId(meta.xAxisID);
-		var lineModel = meta.dataset._model;
+	updateElement(point, index) {
+		const me = this;
+		const meta = me.getMeta();
+		const custom = point.custom || {};
+		const datasetIndex = me.index;
+		const yScale = me.getScaleForId(meta.yAxisID);
+		const xScale = me.getScaleForId(meta.xAxisID);
+		const lineModel = meta.dataset._model;
 
-		var options = me._resolvePointOptions(point, index);
-		var {x, y} = me.calculatePointPosition(index);
+		const options = me._resolvePointOptions(point, index);
+		const {x, y} = me.calculatePointPosition(index);
 
 		// Utility
 		point._xScale = xScale;
@@ -29,8 +30,8 @@ var Controller = Chart.controllers.line.extend({
 
 		// Desired view properties
 		point._model = {
-			x: x,
-			y: y,
+			x,
+			y,
 			skip: custom.skip || isNaN(x) || isNaN(y),
 			// Appearance
 			radius: options.radius,
@@ -44,29 +45,29 @@ var Controller = Chart.controllers.line.extend({
 			// Tooltip
 			hitRadius: options.hitRadius
 		};
-	},
+	}
 
 	/**
 	 * @private
 	 */
-	_resolvePointOptions: function(element, index) {
-		var me = this;
-		var chart = me.chart;
-		var dataset = chart.data.datasets[me.index];
-		var custom = element.custom || {};
-		var options = chart.options.elements.point;
-		var values = {};
-		var i, ilen, key;
+	_resolvePointOptions(element, index) {
+		const me = this;
+		const chart = me.chart;
+		const dataset = chart.data.datasets[me.index];
+		const custom = element.custom || {};
+		const options = chart.options.elements.point;
+		const values = {};
+		let i, ilen, key;
 
 		// Scriptable options
-		var context = {
-			chart: chart,
+		const context = {
+			chart,
 			dataIndex: index,
-			dataset: dataset,
+			dataset,
 			datasetIndex: me.index
 		};
 
-		var ELEMENT_OPTIONS = {
+		const ELEMENT_OPTIONS = {
 			backgroundColor: 'pointBackgroundColor',
 			borderColor: 'pointBorderColor',
 			borderWidth: 'pointBorderWidth',
@@ -79,7 +80,7 @@ var Controller = Chart.controllers.line.extend({
 			radius: 'pointRadius',
 			rotation: 'pointRotation'
 		};
-		var keys = Object.keys(ELEMENT_OPTIONS);
+		const keys = Object.keys(ELEMENT_OPTIONS);
 
 		for (i = 0, ilen = keys.length; i < ilen; ++i) {
 			key = keys[i];
@@ -92,12 +93,13 @@ var Controller = Chart.controllers.line.extend({
 		}
 
 		return values;
-	},
-	calculatePointPosition: function(dataIndex) {
-		var scale = this.chart.scale;
-		var data = this.getDataset().data[dataIndex];
+	}
+
+	calculatePointPosition(dataIndex) {
+		const scale = this.chart.scale;
+		const data = this.getDataset().data[dataIndex];
 		return scale.getPointPosition(data.real, data.imag);
-	},
-});
+	}
+}
 
 export default Controller;

@@ -1,3 +1,6 @@
+/* eslint-disable import/no-commonjs */
+/* eslint-env es6 */
+
 const terser = require('rollup-plugin-terser').terser;
 const pkg = require('./package.json');
 
@@ -13,7 +16,7 @@ module.exports = [
 		input: 'src/index.js',
 		output: {
 			file: `dist/${pkg.name}.js`,
-			banner: banner,
+			banner,
 			format: 'umd',
 			indent: false,
 			globals: {

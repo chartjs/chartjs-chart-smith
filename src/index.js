@@ -12,12 +12,10 @@ Chart.defaults.smith = {
 	},
 	tooltips: {
 		callbacks: {
-			title: function() {
-				return null;
-			},
-			label: function(bodyItem, data) {
-				var dataset = data.datasets[bodyItem.datasetIndex];
-				var d = dataset.data[bodyItem.index];
+			title: () => null,
+			label: (bodyItem, data) => {
+				const dataset = data.datasets[bodyItem.datasetIndex];
+				const d = dataset.data[bodyItem.index];
 				return dataset.label + ': ' + d.real + ' + ' + d.imag + 'i';
 			}
 		}

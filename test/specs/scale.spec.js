@@ -1,11 +1,11 @@
 import Chart from 'chart.js';
 import Scale, {defaults} from '../../src/scale.js';
 
-describe('Smith Scale', function() {
-	it('should get the correct value for points', function() {
+describe('Smith Scale', () => {
+	it('should get the correct value for points', () => {
 		// Create a mock scale for now
-		var scaleConfig = Chart.helpers.clone(defaults);
-		var scale = new Scale({
+		const scaleConfig = Chart.helpers.clone(defaults);
+		const scale = new Scale({
 			options: scaleConfig,
 		});
 
