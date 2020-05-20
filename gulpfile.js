@@ -76,7 +76,7 @@ gulp.task('docs', function() {
 	var mode = argv.watch ? 'dev' : 'build';
 	var out = path.join(argv.output, argv.docsDir);
 	var args = argv.watch ? '' : '--dest ' + out;
-	return run('vuepress/bin/vuepress.js', [mode, 'docs', args]);
+	return run('vuepress', [mode, 'docs', args]);
 });
 
 gulp.task('samples', function() {
