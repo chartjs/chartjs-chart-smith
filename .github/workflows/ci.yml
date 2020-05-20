@@ -31,10 +31,10 @@ jobs:
           echo "::set-env name=DISPLAY:::99.0"
       - run: npm install
       - name: RUN CI
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: gulp test --coverage
       - name: Publish Test Results
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: cat ./coverage/lcov.info | ./node_modules/.bin/coveralls
         shell: bash
         continue-on-error: true
