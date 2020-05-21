@@ -1,4 +1,7 @@
-# chartjs-chart-smith
+---
+id: index
+title: Smith Charts with Chart.js
+---
 
 To create a Smith Chart, include `Chart.Smith.js` after `Chart.js` and then create the chart by setting the `type` attribute to `'smith'`
 

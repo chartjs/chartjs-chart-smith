@@ -1,62 +1,28 @@
 // VERSION replaced by deploy script
 module.exports = {
-  title: 'Chart.js',
-  tagline: 'Open source HTML5 Charts for your website',
+  title: 'chartjs-chart-smith',
+  tagline: 'Smith chart extension to Chart.js',
   url: 'https://chartjs.org',
-  baseUrl: '/docs/VERSION/',
+  baseUrl: '/',
   favicon: 'img/favicon.ico',
   organizationName: 'chartjs', // Usually your GitHub org/user name.
-  projectName: 'chartjs.github.io', // Usually your repo name.
+  projectName: 'chartjs-chart-smith.github.io', // Usually your repo name.
   plugins: [],
-  scripts: ['https://www.chartjs.org/dist/VERSION/Chart.min.js'],
+  scripts: ['https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.js'],
   themeConfig: {
     disableDarkMode: true, // Would need to implement for Charts embedded in docs
     navbar: {
-      title: 'Chart.js',
-      logo: {
-        alt: 'Chart.js Logo',
-        src: 'img/logo.svg',
-      },
+      title: 'Smith Chart - chartjs-chart-smith',
     },
     footer: {
       style: 'dark',
       links: [
         {
-          title: 'Other Docs',
-          items: [
-            {
-              label: 'Samples',
-              href: 'https://www.chartjs.org/samples/VERSION/',
-            },
-            {
-              label: 'v2 Docs',
-              href: 'https://www.chartjs.org/docs/2.9.3/',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Slack',
-              href: 'https://chartjs-slack.herokuapp.com/',
-            },
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/chart.js',
-            },
-          ],
-        },
-        {
           title: 'Developers',
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/chartjs/Chart.js',
-            },
-            {
-              label: 'Contributing',
-              to: 'developers/contributing',
+              href: 'https://github.com/chartjs/chartjs-chart-smith',
             },
           ],
         },
@@ -69,10 +35,9 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '',
           editUrl:
-            'https://github.com/chartjs/Chart.js/edit/master/docs/',
+            'https://github.com/chartjs/chartjs-chart-smith/edit/master/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
