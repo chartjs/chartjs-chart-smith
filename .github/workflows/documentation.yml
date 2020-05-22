@@ -34,4 +34,4 @@ jobs:
           git config --global user.email "$GIT_EMAIL"
           echo "machine github.com login ${GIT_EMAIL} password ${GIT_TOKEN}" > ~/.netrc
           npm ci
-          GIT_USER=$GIT_EMAIL yarn deploy
+          GIT_USER="$GIT_EMAIL" yarn deploy
