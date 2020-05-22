@@ -3,10 +3,10 @@ module.exports = {
   title: 'chartjs-chart-smith',
   tagline: 'Smith chart extension to Chart.js',
   url: 'https://chartjs.org',
-  baseUrl: '/',
+  baseUrl: '/chartjs-chart-smith/',
   favicon: 'img/favicon.ico',
   organizationName: 'chartjs', // Usually your GitHub org/user name.
-  projectName: 'chartjs-chart-smith.github.io', // Usually your repo name.
+  projectName: 'chartjs-chart-smith', // Usually your repo name.
   plugins: [],
   scripts: ['https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.js'],
   themeConfig: {
