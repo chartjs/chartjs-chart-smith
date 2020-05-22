@@ -33,6 +33,5 @@ jobs:
           git config --global user.name "Chart.js"
           git config --global user.email "$GIT_EMAIL"
           echo "machine github.com login ${GH_NAME} password ${GIT_TOKEN}" > ~/.netrc
-          GIT_USER="${GH_NAME}" yarn deploy
           npm ci
-          npx docusaurus deploy
+          GIT_USER="${GH_NAME}" yarn deploy
