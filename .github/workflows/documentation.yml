@@ -28,12 +28,10 @@ jobs:
         with:
           node-version: '12.x'
       - name: Release to GitHub Pages
-        env:
-          GIT_USER: git
         run: |
           cd docs
           git config --global user.name "Chart.js"
           git config --global user.email "$GIT_EMAIL"
           echo "machine github.com login ${GIT_EMAIL} password ${GIT_TOKEN}" > ~/.netrc
           npm ci
-          yarn deploy
+          GIT_USER=$GIT_EMAIL yarn deploy
