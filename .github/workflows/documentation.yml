@@ -28,6 +28,8 @@ jobs:
         with:
           node-version: '12.x'
       - name: Release to GitHub Pages
+        env:
+          GIT_USER: git
         run: |
           cd docs
           git config --global user.name "Chart.js"
