@@ -3,6 +3,12 @@ id: index
 title: Smith Charts with Chart.js
 ---
 
+## Installation
+
+```bash
+> npm install chartjs-chart-smith
+```
+
 To create a Smith Chart, include `chartjs-chart-smith.js` after `Chart.js` and then create the chart by setting the `type` attribute to `'smith'`. 
 
 ```javascript
