@@ -3,7 +3,7 @@ id: index
 title: Smith Charts with Chart.js
 ---
 
-To create a Smith Chart, include `Chart.Smith.js` after `Chart.js` and then create the chart by setting the `type` attribute to `'smith'`
+To create a Smith Chart, include `chartjs-chart-smith.js` after `Chart.js` and then create the chart by setting the `type` attribute to `'smith'`. 
 
 ```javascript
 var mySmithChart = new Chart({
@@ -128,7 +128,7 @@ The datasets for smith charts support many of the same options as the line chart
 
 ## License
 
-Chart.Smith.js is available under the [MIT license](http://opensource.org/licenses/MIT).
+chartjs-chart-smith is available under the [MIT license](http://opensource.org/licenses/MIT).
 
 ## Bugs & issues
 
