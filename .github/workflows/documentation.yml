@@ -47,5 +47,6 @@ jobs:
         run: |
           git config --global user.email "$GIT_EMAIL"
           git config --global user.name "chartjs-ci"
+          cd docs
           npm ci
           npx docusaurus deploy
