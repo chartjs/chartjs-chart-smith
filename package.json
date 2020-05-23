@@ -4,7 +4,7 @@
     "name": "Evert Timberg"
   },
   "description": "Create Smith Chart with Chart.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "homepage": "https://github.com/chartjs/chartjs-chart-smith",
   "jsdelivr": "dist/chartjs-chart-smith.min.js",
