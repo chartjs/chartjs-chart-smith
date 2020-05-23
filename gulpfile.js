@@ -14,7 +14,6 @@ const pkg = require('./package.json');
 
 const argv = require('yargs')
 	.option('output', {alias: 'o', default: 'dist'})
-	.option('samples-dir', {default: 'samples'})
 	.option('docs-dir', {default: 'docs'})
 	.option('www-dir', {default: 'www'})
 	.argv;
@@ -58,7 +57,6 @@ gulp.task('test', (done) => {
 
 gulp.task('lint', () => {
 	const files = [
-		'samples/**/*.js',
 		'src/**/*.js',
 		'test/**/*.js',
 		'*.js'
@@ -76,39 +74,6 @@ gulp.task('docs', () => {
 	const args = argv.watch ? '' : '--dest ' + out;
 	return run('vuepress', [mode, 'docs', args]);
 });
-
-gulp.task('samples', () => {
-	// since we moved the dist files one folder up (package root), we need to rewrite
-	// samples src="../dist/ to src="../ and then copy them in the /samples directory.
-	const out = path.join(argv.output, argv.samplesDir);
-	return gulp.src('samples/**/*', {base: 'samples'})
-		.pipe(streamify(replace(/src="((?:\.\.\/)+)dist\//g, 'src="$1', {skipBinary: true})))
-		.pipe(gulp.dest(out));
-});
-
-gulp.task('package', gulp.series(gulp.parallel('build', 'samples'), () => {
-	const out = argv.output;
-	const streams = merge(
-		gulp.src(path.join(out, argv.samplesDir, '**/*'), {base: out}),
-		gulp.src([path.join(out, '*.js'), 'LICENSE.md'])
-	);
-
-	return streams
-		.pipe(zip(pkg.name + '.zip'))
-		.pipe(gulp.dest(out));
-}));
-
-gulp.task('netlify', gulp.series(gulp.parallel('build', 'docs', 'samples'), () => {
-	const root = argv.output;
-	const out = path.join(root, argv.wwwDir);
-	const streams = merge(
-		gulp.src(path.join(root, argv.docsDir, '**/*'), {base: path.join(root, argv.docsDir)}),
-		gulp.src(path.join(root, argv.samplesDir, '**/*'), {base: root}),
-		gulp.src(path.join(root, '*.js'))
-	);
-
-	return streams.pipe(gulp.dest(out));
-}));
 
 gulp.task('bower', () => {
 	const json = JSON.stringify({
