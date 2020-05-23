@@ -7,6 +7,7 @@ import Scale, {defaults} from './scale';
 // Register the Controller and Scale
 Chart.controllers.smith = Controller;
 Chart.defaults.smith = {
+	aspectRatio: 1,
 	scale: {
 		type: 'smith',
 	},
