@@ -1,0 +1,38 @@
+---
+id: examples
+title: General
+---
+
+```jsx live
+function example() {
+  useEffect(() => {
+    const ctx = document.getElementById('chartjs-0').getContext('2d');
+    const cfg = {
+      type: 'smith',
+      options: {
+        aspectRatio: 1,
+        elements: {
+          point: {
+            pointStyle: 'cross',
+            radius: 10,
+            hoverRadius: 10,
+            borderColor: 'black'
+          }
+        }
+      },
+      data: {
+        datasets: [{
+          label: 'My Dataset',
+          data: [
+            { real : 1.0, imag : 2.0}, 
+            { real : 1.0, imag : 1.0},
+            { real : 1.0, imag : -1.0}
+          ],
+        }]
+      }
+    };
+    new Chart(ctx, cfg);
+  });
+  return <div className="chartjs-wrapper"><canvas id="chartjs-0" className="chartjs"></canvas></div>;
+}
+```

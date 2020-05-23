@@ -1,6 +1,7 @@
 ---
 id: index
 title: Smith Charts with Chart.js
+sidebar: index
 ---
 
 ## Installation

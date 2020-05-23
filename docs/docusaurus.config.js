@@ -8,7 +8,11 @@ module.exports = {
   organizationName: 'chartjs', // Usually your GitHub org/user name.
   projectName: 'chartjs-chart-smith', // Usually your repo name.
   plugins: [],
-  scripts: ['https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.js'],
+  scripts: [
+    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.js',
+    'https://cdn.jsdelivr.net/npm/chartjs-chart-smith/dist/chartjs-chart-smith.min.js'
+  ],
+  themes: ['@docusaurus/theme-live-codeblock'],
   themeConfig: {
     disableDarkMode: true, // Would need to implement for Charts embedded in docs
     navbar: {
@@ -36,8 +40,8 @@ module.exports = {
       {
         docs: {
           routeBasePath: '',
-          editUrl:
-            'https://github.com/chartjs/chartjs-chart-smith/edit/master/docs/',
+          editUrl: 'https://github.com/chartjs/chartjs-chart-smith/edit/master/docs/',
+          sidebarPath: require.resolve('./sidebars.js'),
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
