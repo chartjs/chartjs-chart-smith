@@ -25,13 +25,9 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '12'
-      - name: Setup xvfb
-        run: |
-          Xvfb :99 -screen 0 1024x768x24 &
-          echo "::set-env name=DISPLAY:::99.0"
       - run: npm install
       - name: RUN CI
-        run: gulp test --coverage
+        run: xvfb-run --autoservernum gulp test --coverage
       - name: Publish Test Results
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
