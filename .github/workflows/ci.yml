@@ -27,7 +27,7 @@ jobs:
           node-version: '12'
       - run: npm install
       - name: RUN CI
-        run: xvfb-run --autoservernum gulp test --coverage
+        run: xvfb-run --auto-servernum gulp test --coverage
       - name: Publish Test Results
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
